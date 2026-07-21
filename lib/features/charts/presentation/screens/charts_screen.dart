@@ -30,7 +30,7 @@ class ChartsScreen extends ConsumerWidget {
               childAspectRatio: 0.85,
             ),
             itemCount: 6,
-            itemBuilder: (_, __) => const ShimmerCardSkeleton(height: 180),
+            itemBuilder: (_, _) => const ShimmerCardSkeleton(height: 180),
           ),
           error: (error, _) => ErrorView(
             error: error,

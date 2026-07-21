@@ -31,7 +31,7 @@ class ChartThumbnail extends ConsumerWidget {
                 tag: 'chart-${chart.name}',
                 child: imageAsync.when(
                   loading: () => const ShimmerBox(width: double.infinity, height: double.infinity, borderRadius: 0),
-                  error: (_, __) => const Center(child: Icon(Icons.broken_image_outlined)),
+                  error: (_, _) => const Center(child: Icon(Icons.broken_image_outlined)),
                   data: (bytes) => Image.memory(bytes, fit: BoxFit.cover),
                 ),
               ),

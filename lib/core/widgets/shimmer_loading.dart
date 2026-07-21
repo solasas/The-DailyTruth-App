@@ -78,11 +78,18 @@ class ShimmerListSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // shrinkWrap + NeverScrollableScrollPhysics lets this skeleton size to
+    // its content, so it works both as a whole screen's body (bounded by the
+    // Scaffold) and as one item embedded inside another scrollable (e.g. the
+    // Home dashboard's outer ListView) without hitting an unbounded-height
+    // viewport error.
     return ListView.separated(
       padding: const EdgeInsets.all(16),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: count,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
-      itemBuilder: (_, __) => ShimmerCardSkeleton(height: itemHeight),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      itemBuilder: (_, _) => ShimmerCardSkeleton(height: itemHeight),
     );
   }
 }

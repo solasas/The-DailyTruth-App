@@ -14,7 +14,7 @@ class SectionHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(title, style: Theme.of(context).textTheme.titleLarge),
-        if (action != null) action!,
+        ?action,
       ],
     );
   }

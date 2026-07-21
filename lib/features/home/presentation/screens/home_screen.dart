@@ -73,7 +73,7 @@ class HomeScreen extends ConsumerWidget {
                     delay: const Duration(milliseconds: 60),
                     child: bestModelAsync.when(
                       loading: () => const ShimmerCardSkeleton(height: 92),
-                      error: (_, __) => const QuickStatsRow(bestModel: null),
+                      error: (_, _) => const QuickStatsRow(bestModel: null),
                       data: (best) => QuickStatsRow(bestModel: best),
                     ),
                   ),

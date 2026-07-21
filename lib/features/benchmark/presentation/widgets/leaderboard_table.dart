@@ -35,38 +35,38 @@ class LeaderboardTable extends StatelessWidget {
         columns: [
           DataColumn(
             label: const Text('Rank'),
-            onSort: (_, __) => onSort(LeaderboardColumn.rank),
+            onSort: (_, _) => onSort(LeaderboardColumn.rank),
           ),
           const DataColumn(label: Text('Model')),
           DataColumn(
             label: const Text('Accuracy'),
             numeric: true,
-            onSort: (_, __) => onSort(LeaderboardColumn.accuracy),
+            onSort: (_, _) => onSort(LeaderboardColumn.accuracy),
           ),
           DataColumn(
             label: const Text('F1'),
             numeric: true,
-            onSort: (_, __) => onSort(LeaderboardColumn.f1),
+            onSort: (_, _) => onSort(LeaderboardColumn.f1),
           ),
           DataColumn(
             label: const Text('Precision'),
             numeric: true,
-            onSort: (_, __) => onSort(LeaderboardColumn.precision),
+            onSort: (_, _) => onSort(LeaderboardColumn.precision),
           ),
           DataColumn(
             label: const Text('Recall'),
             numeric: true,
-            onSort: (_, __) => onSort(LeaderboardColumn.recall),
+            onSort: (_, _) => onSort(LeaderboardColumn.recall),
           ),
           DataColumn(
             label: const Text('AUC'),
             numeric: true,
-            onSort: (_, __) => onSort(LeaderboardColumn.auc),
+            onSort: (_, _) => onSort(LeaderboardColumn.auc),
           ),
           DataColumn(
             label: const Text('Train Time'),
             numeric: true,
-            onSort: (_, __) => onSort(LeaderboardColumn.trainingTime),
+            onSort: (_, _) => onSort(LeaderboardColumn.trainingTime),
           ),
         ],
         rows: results.map((result) {
