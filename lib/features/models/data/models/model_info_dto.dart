@@ -1,37 +1,53 @@
-// ignore_for_file: invalid_annotation_target
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../domain/entities/model_info.dart';
 
 part 'model_info_dto.freezed.dart';
-part 'model_info_dto.g.dart';
 
-/// Wire format for a model entry returned by `GET /models` and `GET /results`.
+/// Wire format for a model entry returned by `GET /models`.
 ///
-/// Numeric metrics are parsed leniently (`num` -> `double`) since some
-/// backends serialize metrics as integers (e.g. `1` instead of `1.0`).
+/// The backend nests headline metrics under a `metrics` object and uses
+/// `name`/`display_name` for the machine id vs. the human-friendly label, so
+/// this DTO parses itself by hand rather than via json_serializable.
 @freezed
 class ModelInfoDto with _$ModelInfoDto {
   const factory ModelInfoDto({
-    @JsonKey(name: 'model_name') required String modelName,
+    required String name,
+    required String displayName,
     required String category,
     @Default(false) bool loaded,
-    @JsonKey(fromJson: _toDouble) @Default(0.0) double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) @Default(0.0) double f1Score,
-    @JsonKey(fromJson: _toDouble) @Default(0.0) double precision,
-    @JsonKey(fromJson: _toDouble) @Default(0.0) double recall,
-    @JsonKey(fromJson: _toDouble) @Default(0.0) double auc,
-    @JsonKey(name: 'feature_type') @Default('unknown') String featureType,
+    @Default(0.0) double accuracy,
+    @Default(0.0) double f1Score,
+    @Default(0.0) double precision,
+    @Default(0.0) double recall,
+    @Default(0.0) double auc,
+    @Default('unknown') String featureType,
   }) = _ModelInfoDto;
 
   const ModelInfoDto._();
 
-  factory ModelInfoDto.fromJson(Map<String, dynamic> json) =>
-      _$ModelInfoDtoFromJson(json);
+  factory ModelInfoDto.fromJson(Map<String, dynamic> json) {
+    final metrics = json['metrics'] as Map<String, dynamic>? ?? const {};
+    final name = json['name'] as String? ?? json['model_name'] as String? ?? '';
+
+    return ModelInfoDto(
+      name: name,
+      displayName: json['display_name'] as String? ?? name,
+      category: json['category'] as String? ?? 'unknown',
+      loaded: json['loaded'] as bool? ?? false,
+      accuracy: _toDouble(metrics['accuracy'] ?? json['accuracy']),
+      f1Score: _toDouble(metrics['f1'] ?? metrics['f1_score'] ?? json['f1_score']),
+      precision: _toDouble(metrics['precision'] ?? json['precision']),
+      recall: _toDouble(metrics['recall'] ?? json['recall']),
+      auc: _toDouble(metrics['auc'] ?? json['auc']),
+      featureType: json['feature_type'] as String? ?? 'unknown',
+    );
+  }
 
   ModelInfo toEntity() {
     return ModelInfo(
-      name: modelName,
+      name: name,
+      displayName: displayName,
       category: category,
       loaded: loaded,
       accuracy: accuracy,

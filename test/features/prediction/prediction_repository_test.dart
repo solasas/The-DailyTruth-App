@@ -18,40 +18,43 @@ void main() {
   });
 
   group('PredictionRepositoryImpl.predict', () {
-    test('maps a FAKE verdict DTO to a PredictionLabel.fake entity', () async {
+    test('maps a fake verdict DTO to a PredictionLabel.fake entity', () async {
       when(() => remoteDataSource.predict(text: any(named: 'text'), modelName: any(named: 'modelName')))
           .thenAnswer(
         (_) async => const PredictionResultDto(
-          prediction: 'FAKE',
+          label: 'fake',
           confidence: 0.87,
-          fakeProbability: 0.87,
-          realProbability: 0.13,
-          modelName: 'BERT',
+          probFake: 0.87,
+          probReal: 0.13,
+          modelName: 'bert',
+          displayName: 'BERT',
           category: 'transformer',
         ),
       );
 
-      final result = await repository.predict(text: 'some article', modelName: 'BERT');
+      final result = await repository.predict(text: 'some article', modelName: 'bert');
 
       expect(result.label, PredictionLabel.fake);
       expect(result.confidence, 0.87);
-      expect(result.modelName, 'BERT');
+      expect(result.modelName, 'bert');
+      expect(result.displayName, 'BERT');
     });
 
-    test('maps a REAL verdict DTO to a PredictionLabel.real entity', () async {
+    test('maps a real verdict DTO to a PredictionLabel.real entity', () async {
       when(() => remoteDataSource.predict(text: any(named: 'text'), modelName: any(named: 'modelName')))
           .thenAnswer(
         (_) async => const PredictionResultDto(
-          prediction: 'REAL',
+          label: 'real',
           confidence: 0.75,
-          fakeProbability: 0.25,
-          realProbability: 0.75,
-          modelName: 'SVM',
+          probFake: 0.25,
+          probReal: 0.75,
+          modelName: 'linear_svm',
+          displayName: 'Linear SVM',
           category: 'classical',
         ),
       );
 
-      final result = await repository.predict(text: 'some article', modelName: 'SVM');
+      final result = await repository.predict(text: 'some article', modelName: 'linear_svm');
 
       expect(result.label, PredictionLabel.real);
     });
@@ -61,22 +64,25 @@ void main() {
     test('maps consensus + per-model results', () async {
       when(() => remoteDataSource.predictAll(text: any(named: 'text'))).thenAnswer(
         (_) async => const AllModelsPredictionDto(
-          consensus: ConsensusDto(prediction: 'FAKE', confidence: 0.8),
+          consensus: 'fake',
+          consensusConfidence: 0.8,
           results: [
             PredictionResultDto(
-              prediction: 'FAKE',
+              label: 'fake',
               confidence: 0.8,
-              fakeProbability: 0.8,
-              realProbability: 0.2,
-              modelName: 'Model A',
+              probFake: 0.8,
+              probReal: 0.2,
+              modelName: 'model_a',
+              displayName: 'Model A',
               category: 'classical',
             ),
             PredictionResultDto(
-              prediction: 'REAL',
+              label: 'real',
               confidence: 0.6,
-              fakeProbability: 0.4,
-              realProbability: 0.6,
-              modelName: 'Model B',
+              probFake: 0.4,
+              probReal: 0.6,
+              modelName: 'model_b',
+              displayName: 'Model B',
               category: 'ensemble',
             ),
           ],
@@ -88,7 +94,7 @@ void main() {
       expect(result.consensusLabel, PredictionLabel.fake);
       expect(result.consensusConfidence, 0.8);
       expect(result.results, hasLength(2));
-      expect(result.results.first.modelName, 'Model A');
+      expect(result.results.first.displayName, 'Model A');
     });
   });
 }

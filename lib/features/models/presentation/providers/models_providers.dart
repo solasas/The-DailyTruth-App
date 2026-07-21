@@ -105,6 +105,7 @@ final filteredModelsProvider = Provider.autoDispose<AsyncValue<List<ModelInfo>>>
     var result = models.where((model) {
       final matchesSearch =
           filter.search.isEmpty ||
+          model.displayName.toLowerCase().contains(filter.search.toLowerCase()) ||
           model.name.toLowerCase().contains(filter.search.toLowerCase());
       final matchesCategory =
           filter.category == null || model.category == filter.category;
@@ -117,7 +118,7 @@ final filteredModelsProvider = Provider.autoDispose<AsyncValue<List<ModelInfo>>>
         case ModelSortOption.accuracyDesc:
           return b.accuracy.compareTo(a.accuracy);
         case ModelSortOption.nameAsc:
-          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+          return a.displayName.toLowerCase().compareTo(b.displayName.toLowerCase());
         case ModelSortOption.categoryAsc:
           return a.category.toLowerCase().compareTo(b.category.toLowerCase());
       }

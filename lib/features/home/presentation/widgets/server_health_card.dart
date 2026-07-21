@@ -4,18 +4,21 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../domain/entities/server_health.dart';
 
-/// Green/orange/red status card summarizing backend health, shown at the
-/// top of the dashboard.
+/// Gradient hero card summarizing backend health — green/orange/red per
+/// [ServerHealthStatus] — shown at the top of the dashboard.
 class ServerHealthCard extends StatelessWidget {
   const ServerHealthCard({super.key, required this.health});
 
   final ServerHealth health;
 
-  Color get _color => switch (health.status) {
-    ServerHealthStatus.healthy => AppColors.success,
-    ServerHealthStatus.degraded => AppColors.warning,
-    ServerHealthStatus.unavailable => AppColors.error,
-    ServerHealthStatus.unknown => AppColors.textSecondaryLight,
+  List<Color> get _gradient => switch (health.status) {
+    ServerHealthStatus.healthy => AppColors.successGradient,
+    ServerHealthStatus.degraded => AppColors.warningGradient,
+    ServerHealthStatus.unavailable => AppColors.errorGradient,
+    ServerHealthStatus.unknown => [
+      AppColors.textSecondaryLight,
+      AppColors.textSecondaryDark,
+    ],
   };
 
   String get _label => switch (health.status) {
@@ -34,41 +37,46 @@ class ServerHealthCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SoftCard(
+    return GradientCard(
+      colors: _gradient,
       child: Row(
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(color: _color.withValues(alpha: 0.14), shape: BoxShape.circle),
-            child: Icon(_icon, color: _color, size: 28),
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(_icon, color: Colors.white, size: 30),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text('Server Status', style: Theme.of(context).textTheme.bodySmall),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(color: _color, shape: BoxShape.circle),
-                    ),
-                  ],
+                const Text(
+                  'SERVER STATUS',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   _label,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(color: _color, fontWeight: FontWeight.w700),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 Text(
                   '${health.modelsLoaded}${health.totalModels != null ? '/${health.totalModels}' : ''} models loaded',
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: const TextStyle(color: Colors.white70, fontSize: 13),
                 ),
               ],
             ),

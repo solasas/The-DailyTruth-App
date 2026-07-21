@@ -30,7 +30,7 @@ class BestModelCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            result.modelName,
+            result.displayName,
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.w700),
@@ -47,7 +47,9 @@ class BestModelCard extends StatelessWidget {
               const SizedBox(width: 28),
               _Stat(
                 label: 'Training Time',
-                value: '${result.trainingTimeSeconds.toStringAsFixed(1)}s',
+                value: result.trainingTimeSeconds != null
+                    ? '${result.trainingTimeSeconds!.toStringAsFixed(1)}s'
+                    : '—',
               ),
             ],
           ),

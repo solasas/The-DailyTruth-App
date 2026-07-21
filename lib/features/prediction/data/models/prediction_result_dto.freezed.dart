@@ -15,25 +15,15 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-PredictionResultDto _$PredictionResultDtoFromJson(Map<String, dynamic> json) {
-  return _PredictionResultDto.fromJson(json);
-}
-
 /// @nodoc
 mixin _$PredictionResultDto {
-  String get prediction => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
+  String get label => throw _privateConstructorUsedError;
   double get confidence => throw _privateConstructorUsedError;
-  @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-  double get fakeProbability => throw _privateConstructorUsedError;
-  @JsonKey(name: 'real_probability', fromJson: _toDouble)
-  double get realProbability => throw _privateConstructorUsedError;
-  @JsonKey(name: 'model_name')
+  double get probFake => throw _privateConstructorUsedError;
+  double get probReal => throw _privateConstructorUsedError;
   String get modelName => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
-
-  /// Serializes this PredictionResultDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of PredictionResultDto
   /// with the given fields replaced by the non-null parameter values.
@@ -50,13 +40,12 @@ abstract class $PredictionResultDtoCopyWith<$Res> {
   ) = _$PredictionResultDtoCopyWithImpl<$Res, PredictionResultDto>;
   @useResult
   $Res call({
-    String prediction,
-    @JsonKey(fromJson: _toDouble) double confidence,
-    @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-    double fakeProbability,
-    @JsonKey(name: 'real_probability', fromJson: _toDouble)
-    double realProbability,
-    @JsonKey(name: 'model_name') String modelName,
+    String label,
+    double confidence,
+    double probFake,
+    double probReal,
+    String modelName,
+    String displayName,
     String category,
   });
 }
@@ -76,34 +65,39 @@ class _$PredictionResultDtoCopyWithImpl<$Res, $Val extends PredictionResultDto>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? prediction = null,
+    Object? label = null,
     Object? confidence = null,
-    Object? fakeProbability = null,
-    Object? realProbability = null,
+    Object? probFake = null,
+    Object? probReal = null,
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
   }) {
     return _then(
       _value.copyWith(
-            prediction: null == prediction
-                ? _value.prediction
-                : prediction // ignore: cast_nullable_to_non_nullable
+            label: null == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
                       as String,
             confidence: null == confidence
                 ? _value.confidence
                 : confidence // ignore: cast_nullable_to_non_nullable
                       as double,
-            fakeProbability: null == fakeProbability
-                ? _value.fakeProbability
-                : fakeProbability // ignore: cast_nullable_to_non_nullable
+            probFake: null == probFake
+                ? _value.probFake
+                : probFake // ignore: cast_nullable_to_non_nullable
                       as double,
-            realProbability: null == realProbability
-                ? _value.realProbability
-                : realProbability // ignore: cast_nullable_to_non_nullable
+            probReal: null == probReal
+                ? _value.probReal
+                : probReal // ignore: cast_nullable_to_non_nullable
                       as double,
             modelName: null == modelName
                 ? _value.modelName
                 : modelName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            displayName: null == displayName
+                ? _value.displayName
+                : displayName // ignore: cast_nullable_to_non_nullable
                       as String,
             category: null == category
                 ? _value.category
@@ -125,13 +119,12 @@ abstract class _$$PredictionResultDtoImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    String prediction,
-    @JsonKey(fromJson: _toDouble) double confidence,
-    @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-    double fakeProbability,
-    @JsonKey(name: 'real_probability', fromJson: _toDouble)
-    double realProbability,
-    @JsonKey(name: 'model_name') String modelName,
+    String label,
+    double confidence,
+    double probFake,
+    double probReal,
+    String modelName,
+    String displayName,
     String category,
   });
 }
@@ -150,34 +143,39 @@ class __$$PredictionResultDtoImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? prediction = null,
+    Object? label = null,
     Object? confidence = null,
-    Object? fakeProbability = null,
-    Object? realProbability = null,
+    Object? probFake = null,
+    Object? probReal = null,
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
   }) {
     return _then(
       _$PredictionResultDtoImpl(
-        prediction: null == prediction
-            ? _value.prediction
-            : prediction // ignore: cast_nullable_to_non_nullable
+        label: null == label
+            ? _value.label
+            : label // ignore: cast_nullable_to_non_nullable
                   as String,
         confidence: null == confidence
             ? _value.confidence
             : confidence // ignore: cast_nullable_to_non_nullable
                   as double,
-        fakeProbability: null == fakeProbability
-            ? _value.fakeProbability
-            : fakeProbability // ignore: cast_nullable_to_non_nullable
+        probFake: null == probFake
+            ? _value.probFake
+            : probFake // ignore: cast_nullable_to_non_nullable
                   as double,
-        realProbability: null == realProbability
-            ? _value.realProbability
-            : realProbability // ignore: cast_nullable_to_non_nullable
+        probReal: null == probReal
+            ? _value.probReal
+            : probReal // ignore: cast_nullable_to_non_nullable
                   as double,
         modelName: null == modelName
             ? _value.modelName
             : modelName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
                   as String,
         category: null == category
             ? _value.category
@@ -189,43 +187,42 @@ class __$$PredictionResultDtoImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$PredictionResultDtoImpl extends _PredictionResultDto {
   const _$PredictionResultDtoImpl({
-    required this.prediction,
-    @JsonKey(fromJson: _toDouble) this.confidence = 0.0,
-    @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-    this.fakeProbability = 0.0,
-    @JsonKey(name: 'real_probability', fromJson: _toDouble)
-    this.realProbability = 0.0,
-    @JsonKey(name: 'model_name') this.modelName = '',
+    required this.label,
+    this.confidence = 0.0,
+    this.probFake = 0.0,
+    this.probReal = 0.0,
+    this.modelName = '',
+    this.displayName = '',
     this.category = '',
   }) : super._();
 
-  factory _$PredictionResultDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$PredictionResultDtoImplFromJson(json);
-
   @override
-  final String prediction;
+  final String label;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double confidence;
   @override
-  @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-  final double fakeProbability;
+  @JsonKey()
+  final double probFake;
   @override
-  @JsonKey(name: 'real_probability', fromJson: _toDouble)
-  final double realProbability;
+  @JsonKey()
+  final double probReal;
   @override
-  @JsonKey(name: 'model_name')
+  @JsonKey()
   final String modelName;
+  @override
+  @JsonKey()
+  final String displayName;
   @override
   @JsonKey()
   final String category;
 
   @override
   String toString() {
-    return 'PredictionResultDto(prediction: $prediction, confidence: $confidence, fakeProbability: $fakeProbability, realProbability: $realProbability, modelName: $modelName, category: $category)';
+    return 'PredictionResultDto(label: $label, confidence: $confidence, probFake: $probFake, probReal: $probReal, modelName: $modelName, displayName: $displayName, category: $category)';
   }
 
   @override
@@ -233,29 +230,30 @@ class _$PredictionResultDtoImpl extends _PredictionResultDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$PredictionResultDtoImpl &&
-            (identical(other.prediction, prediction) ||
-                other.prediction == prediction) &&
+            (identical(other.label, label) || other.label == label) &&
             (identical(other.confidence, confidence) ||
                 other.confidence == confidence) &&
-            (identical(other.fakeProbability, fakeProbability) ||
-                other.fakeProbability == fakeProbability) &&
-            (identical(other.realProbability, realProbability) ||
-                other.realProbability == realProbability) &&
+            (identical(other.probFake, probFake) ||
+                other.probFake == probFake) &&
+            (identical(other.probReal, probReal) ||
+                other.probReal == probReal) &&
             (identical(other.modelName, modelName) ||
                 other.modelName == modelName) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.category, category) ||
                 other.category == category));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    prediction,
+    label,
     confidence,
-    fakeProbability,
-    realProbability,
+    probFake,
+    probReal,
     modelName,
+    displayName,
     category,
   );
 
@@ -269,43 +267,32 @@ class _$PredictionResultDtoImpl extends _PredictionResultDto {
         this,
         _$identity,
       );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$PredictionResultDtoImplToJson(this);
-  }
 }
 
 abstract class _PredictionResultDto extends PredictionResultDto {
   const factory _PredictionResultDto({
-    required final String prediction,
-    @JsonKey(fromJson: _toDouble) final double confidence,
-    @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-    final double fakeProbability,
-    @JsonKey(name: 'real_probability', fromJson: _toDouble)
-    final double realProbability,
-    @JsonKey(name: 'model_name') final String modelName,
+    required final String label,
+    final double confidence,
+    final double probFake,
+    final double probReal,
+    final String modelName,
+    final String displayName,
     final String category,
   }) = _$PredictionResultDtoImpl;
   const _PredictionResultDto._() : super._();
 
-  factory _PredictionResultDto.fromJson(Map<String, dynamic> json) =
-      _$PredictionResultDtoImpl.fromJson;
-
   @override
-  String get prediction;
+  String get label;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get confidence;
   @override
-  @JsonKey(name: 'fake_probability', fromJson: _toDouble)
-  double get fakeProbability;
+  double get probFake;
   @override
-  @JsonKey(name: 'real_probability', fromJson: _toDouble)
-  double get realProbability;
+  double get probReal;
   @override
-  @JsonKey(name: 'model_name')
   String get modelName;
+  @override
+  String get displayName;
   @override
   String get category;
 

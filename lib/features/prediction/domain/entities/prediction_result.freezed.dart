@@ -22,6 +22,7 @@ mixin _$PredictionResult {
   double get fakeProbability => throw _privateConstructorUsedError;
   double get realProbability => throw _privateConstructorUsedError;
   String get modelName => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
 
   /// Create a copy of PredictionResult
@@ -44,6 +45,7 @@ abstract class $PredictionResultCopyWith<$Res> {
     double fakeProbability,
     double realProbability,
     String modelName,
+    String displayName,
     String category,
   });
 }
@@ -68,6 +70,7 @@ class _$PredictionResultCopyWithImpl<$Res, $Val extends PredictionResult>
     Object? fakeProbability = null,
     Object? realProbability = null,
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
   }) {
     return _then(
@@ -91,6 +94,10 @@ class _$PredictionResultCopyWithImpl<$Res, $Val extends PredictionResult>
             modelName: null == modelName
                 ? _value.modelName
                 : modelName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            displayName: null == displayName
+                ? _value.displayName
+                : displayName // ignore: cast_nullable_to_non_nullable
                       as String,
             category: null == category
                 ? _value.category
@@ -117,6 +124,7 @@ abstract class _$$PredictionResultImplCopyWith<$Res>
     double fakeProbability,
     double realProbability,
     String modelName,
+    String displayName,
     String category,
   });
 }
@@ -140,6 +148,7 @@ class __$$PredictionResultImplCopyWithImpl<$Res>
     Object? fakeProbability = null,
     Object? realProbability = null,
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
   }) {
     return _then(
@@ -164,6 +173,10 @@ class __$$PredictionResultImplCopyWithImpl<$Res>
             ? _value.modelName
             : modelName // ignore: cast_nullable_to_non_nullable
                   as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
+                  as String,
         category: null == category
             ? _value.category
             : category // ignore: cast_nullable_to_non_nullable
@@ -182,6 +195,7 @@ class _$PredictionResultImpl implements _PredictionResult {
     required this.fakeProbability,
     required this.realProbability,
     required this.modelName,
+    required this.displayName,
     required this.category,
   });
 
@@ -196,11 +210,13 @@ class _$PredictionResultImpl implements _PredictionResult {
   @override
   final String modelName;
   @override
+  final String displayName;
+  @override
   final String category;
 
   @override
   String toString() {
-    return 'PredictionResult(label: $label, confidence: $confidence, fakeProbability: $fakeProbability, realProbability: $realProbability, modelName: $modelName, category: $category)';
+    return 'PredictionResult(label: $label, confidence: $confidence, fakeProbability: $fakeProbability, realProbability: $realProbability, modelName: $modelName, displayName: $displayName, category: $category)';
   }
 
   @override
@@ -217,6 +233,8 @@ class _$PredictionResultImpl implements _PredictionResult {
                 other.realProbability == realProbability) &&
             (identical(other.modelName, modelName) ||
                 other.modelName == modelName) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.category, category) ||
                 other.category == category));
   }
@@ -229,6 +247,7 @@ class _$PredictionResultImpl implements _PredictionResult {
     fakeProbability,
     realProbability,
     modelName,
+    displayName,
     category,
   );
 
@@ -251,6 +270,7 @@ abstract class _PredictionResult implements PredictionResult {
     required final double fakeProbability,
     required final double realProbability,
     required final String modelName,
+    required final String displayName,
     required final String category,
   }) = _$PredictionResultImpl;
 
@@ -264,6 +284,8 @@ abstract class _PredictionResult implements PredictionResult {
   double get realProbability;
   @override
   String get modelName;
+  @override
+  String get displayName;
   @override
   String get category;
 

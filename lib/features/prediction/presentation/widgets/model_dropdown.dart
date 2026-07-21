@@ -30,7 +30,10 @@ class ModelDropdown extends StatelessWidget {
           .map(
             (model) => DropdownMenuItem(
               value: model.name,
-              child: Text('${model.name} · ${model.category}', overflow: TextOverflow.ellipsis),
+              child: Text(
+                '${model.displayName} · ${model.category}',
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           )
           .toList(),

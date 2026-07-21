@@ -15,6 +15,7 @@ class PredictionResult with _$PredictionResult {
     required double fakeProbability,
     required double realProbability,
     required String modelName,
+    required String displayName,
     required String category,
   }) = _PredictionResult;
 }

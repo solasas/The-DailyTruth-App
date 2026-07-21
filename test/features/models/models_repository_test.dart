@@ -20,15 +20,16 @@ void main() {
       when(() => remoteDataSource.getModels()).thenAnswer(
         (_) async => [
           const ModelInfoDto(
-            modelName: 'Logistic Regression',
-            category: 'classical',
+            name: 'logistic_regression',
+            displayName: 'Logistic Regression',
+            category: 'Classical ML',
             loaded: true,
             accuracy: 0.94,
             f1Score: 0.93,
             precision: 0.92,
             recall: 0.91,
             auc: 0.95,
-            featureType: 'TF-IDF',
+            featureType: 'tfidf',
           ),
         ],
       );
@@ -36,7 +37,8 @@ void main() {
       final result = await repository.getModels();
 
       expect(result, hasLength(1));
-      expect(result.first.name, 'Logistic Regression');
+      expect(result.first.name, 'logistic_regression');
+      expect(result.first.displayName, 'Logistic Regression');
       expect(result.first.loaded, isTrue);
       expect(result.first.accuracy, 0.94);
       expect(result.first.overallScore, closeTo(0.93, 0.001));

@@ -15,31 +15,18 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-ModelInfoDto _$ModelInfoDtoFromJson(Map<String, dynamic> json) {
-  return _ModelInfoDto.fromJson(json);
-}
-
 /// @nodoc
 mixin _$ModelInfoDto {
-  @JsonKey(name: 'model_name')
-  String get modelName => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
   bool get loaded => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get accuracy => throw _privateConstructorUsedError;
-  @JsonKey(name: 'f1_score', fromJson: _toDouble)
   double get f1Score => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get precision => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get recall => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get auc => throw _privateConstructorUsedError;
-  @JsonKey(name: 'feature_type')
   String get featureType => throw _privateConstructorUsedError;
-
-  /// Serializes this ModelInfoDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of ModelInfoDto
   /// with the given fields replaced by the non-null parameter values.
@@ -56,15 +43,16 @@ abstract class $ModelInfoDtoCopyWith<$Res> {
   ) = _$ModelInfoDtoCopyWithImpl<$Res, ModelInfoDto>;
   @useResult
   $Res call({
-    @JsonKey(name: 'model_name') String modelName,
+    String name,
+    String displayName,
     String category,
     bool loaded,
-    @JsonKey(fromJson: _toDouble) double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) double f1Score,
-    @JsonKey(fromJson: _toDouble) double precision,
-    @JsonKey(fromJson: _toDouble) double recall,
-    @JsonKey(fromJson: _toDouble) double auc,
-    @JsonKey(name: 'feature_type') String featureType,
+    double accuracy,
+    double f1Score,
+    double precision,
+    double recall,
+    double auc,
+    String featureType,
   });
 }
 
@@ -83,7 +71,8 @@ class _$ModelInfoDtoCopyWithImpl<$Res, $Val extends ModelInfoDto>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? modelName = null,
+    Object? name = null,
+    Object? displayName = null,
     Object? category = null,
     Object? loaded = null,
     Object? accuracy = null,
@@ -95,9 +84,13 @@ class _$ModelInfoDtoCopyWithImpl<$Res, $Val extends ModelInfoDto>
   }) {
     return _then(
       _value.copyWith(
-            modelName: null == modelName
-                ? _value.modelName
-                : modelName // ignore: cast_nullable_to_non_nullable
+            name: null == name
+                ? _value.name
+                : name // ignore: cast_nullable_to_non_nullable
+                      as String,
+            displayName: null == displayName
+                ? _value.displayName
+                : displayName // ignore: cast_nullable_to_non_nullable
                       as String,
             category: null == category
                 ? _value.category
@@ -147,15 +140,16 @@ abstract class _$$ModelInfoDtoImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'model_name') String modelName,
+    String name,
+    String displayName,
     String category,
     bool loaded,
-    @JsonKey(fromJson: _toDouble) double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) double f1Score,
-    @JsonKey(fromJson: _toDouble) double precision,
-    @JsonKey(fromJson: _toDouble) double recall,
-    @JsonKey(fromJson: _toDouble) double auc,
-    @JsonKey(name: 'feature_type') String featureType,
+    double accuracy,
+    double f1Score,
+    double precision,
+    double recall,
+    double auc,
+    String featureType,
   });
 }
 
@@ -173,7 +167,8 @@ class __$$ModelInfoDtoImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? modelName = null,
+    Object? name = null,
+    Object? displayName = null,
     Object? category = null,
     Object? loaded = null,
     Object? accuracy = null,
@@ -185,9 +180,13 @@ class __$$ModelInfoDtoImplCopyWithImpl<$Res>
   }) {
     return _then(
       _$ModelInfoDtoImpl(
-        modelName: null == modelName
-            ? _value.modelName
-            : modelName // ignore: cast_nullable_to_non_nullable
+        name: null == name
+            ? _value.name
+            : name // ignore: cast_nullable_to_non_nullable
+                  as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
                   as String,
         category: null == category
             ? _value.category
@@ -227,53 +226,52 @@ class __$$ModelInfoDtoImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$ModelInfoDtoImpl extends _ModelInfoDto {
   const _$ModelInfoDtoImpl({
-    @JsonKey(name: 'model_name') required this.modelName,
+    required this.name,
+    required this.displayName,
     required this.category,
     this.loaded = false,
-    @JsonKey(fromJson: _toDouble) this.accuracy = 0.0,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) this.f1Score = 0.0,
-    @JsonKey(fromJson: _toDouble) this.precision = 0.0,
-    @JsonKey(fromJson: _toDouble) this.recall = 0.0,
-    @JsonKey(fromJson: _toDouble) this.auc = 0.0,
-    @JsonKey(name: 'feature_type') this.featureType = 'unknown',
+    this.accuracy = 0.0,
+    this.f1Score = 0.0,
+    this.precision = 0.0,
+    this.recall = 0.0,
+    this.auc = 0.0,
+    this.featureType = 'unknown',
   }) : super._();
 
-  factory _$ModelInfoDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$ModelInfoDtoImplFromJson(json);
-
   @override
-  @JsonKey(name: 'model_name')
-  final String modelName;
+  final String name;
+  @override
+  final String displayName;
   @override
   final String category;
   @override
   @JsonKey()
   final bool loaded;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double accuracy;
   @override
-  @JsonKey(name: 'f1_score', fromJson: _toDouble)
+  @JsonKey()
   final double f1Score;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double precision;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double recall;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double auc;
   @override
-  @JsonKey(name: 'feature_type')
+  @JsonKey()
   final String featureType;
 
   @override
   String toString() {
-    return 'ModelInfoDto(modelName: $modelName, category: $category, loaded: $loaded, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, featureType: $featureType)';
+    return 'ModelInfoDto(name: $name, displayName: $displayName, category: $category, loaded: $loaded, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, featureType: $featureType)';
   }
 
   @override
@@ -281,8 +279,9 @@ class _$ModelInfoDtoImpl extends _ModelInfoDto {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ModelInfoDtoImpl &&
-            (identical(other.modelName, modelName) ||
-                other.modelName == modelName) &&
+            (identical(other.name, name) || other.name == name) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.loaded, loaded) || other.loaded == loaded) &&
@@ -297,11 +296,11 @@ class _$ModelInfoDtoImpl extends _ModelInfoDto {
                 other.featureType == featureType));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
-    modelName,
+    name,
+    displayName,
     category,
     loaded,
     accuracy,
@@ -319,54 +318,42 @@ class _$ModelInfoDtoImpl extends _ModelInfoDto {
   @pragma('vm:prefer-inline')
   _$$ModelInfoDtoImplCopyWith<_$ModelInfoDtoImpl> get copyWith =>
       __$$ModelInfoDtoImplCopyWithImpl<_$ModelInfoDtoImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$ModelInfoDtoImplToJson(this);
-  }
 }
 
 abstract class _ModelInfoDto extends ModelInfoDto {
   const factory _ModelInfoDto({
-    @JsonKey(name: 'model_name') required final String modelName,
+    required final String name,
+    required final String displayName,
     required final String category,
     final bool loaded,
-    @JsonKey(fromJson: _toDouble) final double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) final double f1Score,
-    @JsonKey(fromJson: _toDouble) final double precision,
-    @JsonKey(fromJson: _toDouble) final double recall,
-    @JsonKey(fromJson: _toDouble) final double auc,
-    @JsonKey(name: 'feature_type') final String featureType,
+    final double accuracy,
+    final double f1Score,
+    final double precision,
+    final double recall,
+    final double auc,
+    final String featureType,
   }) = _$ModelInfoDtoImpl;
   const _ModelInfoDto._() : super._();
 
-  factory _ModelInfoDto.fromJson(Map<String, dynamic> json) =
-      _$ModelInfoDtoImpl.fromJson;
-
   @override
-  @JsonKey(name: 'model_name')
-  String get modelName;
+  String get name;
+  @override
+  String get displayName;
   @override
   String get category;
   @override
   bool get loaded;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get accuracy;
   @override
-  @JsonKey(name: 'f1_score', fromJson: _toDouble)
   double get f1Score;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get precision;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get recall;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get auc;
   @override
-  @JsonKey(name: 'feature_type')
   String get featureType;
 
   /// Create a copy of ModelInfoDto

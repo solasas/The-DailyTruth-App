@@ -41,7 +41,7 @@ class RecentPredictionTile extends StatelessWidget {
         style: theme.textTheme.bodyMedium,
       ),
       subtitle: Text(
-        '${entry.isAllModels ? "All models" : entry.primaryResult.modelName} · '
+        '${entry.isAllModels ? "All models" : entry.primaryResult.displayName} · '
         '${(confidence * 100).toStringAsFixed(0)}% · ${DateFormatter.relative(entry.timestamp)}',
         style: theme.textTheme.bodySmall,
       ),

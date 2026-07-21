@@ -10,6 +10,7 @@ part 'model_info.freezed.dart';
 class ModelInfo with _$ModelInfo {
   const factory ModelInfo({
     required String name,
+    required String displayName,
     required String category,
     required bool loaded,
     required double accuracy,

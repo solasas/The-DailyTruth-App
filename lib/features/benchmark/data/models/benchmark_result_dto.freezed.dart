@@ -15,30 +15,17 @@ final _privateConstructorUsedError = UnsupportedError(
   'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models',
 );
 
-BenchmarkResultDto _$BenchmarkResultDtoFromJson(Map<String, dynamic> json) {
-  return _BenchmarkResultDto.fromJson(json);
-}
-
 /// @nodoc
 mixin _$BenchmarkResultDto {
-  @JsonKey(name: 'model_name')
   String get modelName => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get accuracy => throw _privateConstructorUsedError;
-  @JsonKey(name: 'f1_score', fromJson: _toDouble)
   double get f1Score => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get precision => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get recall => throw _privateConstructorUsedError;
-  @JsonKey(fromJson: _toDouble)
   double get auc => throw _privateConstructorUsedError;
-  @JsonKey(name: 'training_time', fromJson: _toDouble)
   double get trainingTime => throw _privateConstructorUsedError;
-
-  /// Serializes this BenchmarkResultDto to a JSON map.
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
   /// Create a copy of BenchmarkResultDto
   /// with the given fields replaced by the non-null parameter values.
@@ -55,14 +42,15 @@ abstract class $BenchmarkResultDtoCopyWith<$Res> {
   ) = _$BenchmarkResultDtoCopyWithImpl<$Res, BenchmarkResultDto>;
   @useResult
   $Res call({
-    @JsonKey(name: 'model_name') String modelName,
+    String modelName,
+    String displayName,
     String category,
-    @JsonKey(fromJson: _toDouble) double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) double f1Score,
-    @JsonKey(fromJson: _toDouble) double precision,
-    @JsonKey(fromJson: _toDouble) double recall,
-    @JsonKey(fromJson: _toDouble) double auc,
-    @JsonKey(name: 'training_time', fromJson: _toDouble) double trainingTime,
+    double accuracy,
+    double f1Score,
+    double precision,
+    double recall,
+    double auc,
+    double trainingTime,
   });
 }
 
@@ -82,6 +70,7 @@ class _$BenchmarkResultDtoCopyWithImpl<$Res, $Val extends BenchmarkResultDto>
   @override
   $Res call({
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
     Object? accuracy = null,
     Object? f1Score = null,
@@ -95,6 +84,10 @@ class _$BenchmarkResultDtoCopyWithImpl<$Res, $Val extends BenchmarkResultDto>
             modelName: null == modelName
                 ? _value.modelName
                 : modelName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            displayName: null == displayName
+                ? _value.displayName
+                : displayName // ignore: cast_nullable_to_non_nullable
                       as String,
             category: null == category
                 ? _value.category
@@ -140,14 +133,15 @@ abstract class _$$BenchmarkResultDtoImplCopyWith<$Res>
   @override
   @useResult
   $Res call({
-    @JsonKey(name: 'model_name') String modelName,
+    String modelName,
+    String displayName,
     String category,
-    @JsonKey(fromJson: _toDouble) double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) double f1Score,
-    @JsonKey(fromJson: _toDouble) double precision,
-    @JsonKey(fromJson: _toDouble) double recall,
-    @JsonKey(fromJson: _toDouble) double auc,
-    @JsonKey(name: 'training_time', fromJson: _toDouble) double trainingTime,
+    double accuracy,
+    double f1Score,
+    double precision,
+    double recall,
+    double auc,
+    double trainingTime,
   });
 }
 
@@ -166,6 +160,7 @@ class __$$BenchmarkResultDtoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
     Object? accuracy = null,
     Object? f1Score = null,
@@ -179,6 +174,10 @@ class __$$BenchmarkResultDtoImplCopyWithImpl<$Res>
         modelName: null == modelName
             ? _value.modelName
             : modelName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
                   as String,
         category: null == category
             ? _value.category
@@ -214,50 +213,48 @@ class __$$BenchmarkResultDtoImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$BenchmarkResultDtoImpl extends _BenchmarkResultDto {
   const _$BenchmarkResultDtoImpl({
-    @JsonKey(name: 'model_name') required this.modelName,
+    required this.modelName,
+    required this.displayName,
     required this.category,
-    @JsonKey(fromJson: _toDouble) this.accuracy = 0.0,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) this.f1Score = 0.0,
-    @JsonKey(fromJson: _toDouble) this.precision = 0.0,
-    @JsonKey(fromJson: _toDouble) this.recall = 0.0,
-    @JsonKey(fromJson: _toDouble) this.auc = 0.0,
-    @JsonKey(name: 'training_time', fromJson: _toDouble)
+    this.accuracy = 0.0,
+    this.f1Score = 0.0,
+    this.precision = 0.0,
+    this.recall = 0.0,
+    this.auc = 0.0,
     this.trainingTime = 0.0,
   }) : super._();
 
-  factory _$BenchmarkResultDtoImpl.fromJson(Map<String, dynamic> json) =>
-      _$$BenchmarkResultDtoImplFromJson(json);
-
   @override
-  @JsonKey(name: 'model_name')
   final String modelName;
+  @override
+  final String displayName;
   @override
   final String category;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double accuracy;
   @override
-  @JsonKey(name: 'f1_score', fromJson: _toDouble)
+  @JsonKey()
   final double f1Score;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double precision;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double recall;
   @override
-  @JsonKey(fromJson: _toDouble)
+  @JsonKey()
   final double auc;
   @override
-  @JsonKey(name: 'training_time', fromJson: _toDouble)
+  @JsonKey()
   final double trainingTime;
 
   @override
   String toString() {
-    return 'BenchmarkResultDto(modelName: $modelName, category: $category, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, trainingTime: $trainingTime)';
+    return 'BenchmarkResultDto(modelName: $modelName, displayName: $displayName, category: $category, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, trainingTime: $trainingTime)';
   }
 
   @override
@@ -267,6 +264,8 @@ class _$BenchmarkResultDtoImpl extends _BenchmarkResultDto {
             other is _$BenchmarkResultDtoImpl &&
             (identical(other.modelName, modelName) ||
                 other.modelName == modelName) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.accuracy, accuracy) ||
@@ -280,11 +279,11 @@ class _$BenchmarkResultDtoImpl extends _BenchmarkResultDto {
                 other.trainingTime == trainingTime));
   }
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(
     runtimeType,
     modelName,
+    displayName,
     category,
     accuracy,
     f1Score,
@@ -304,52 +303,39 @@ class _$BenchmarkResultDtoImpl extends _BenchmarkResultDto {
         this,
         _$identity,
       );
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$BenchmarkResultDtoImplToJson(this);
-  }
 }
 
 abstract class _BenchmarkResultDto extends BenchmarkResultDto {
   const factory _BenchmarkResultDto({
-    @JsonKey(name: 'model_name') required final String modelName,
+    required final String modelName,
+    required final String displayName,
     required final String category,
-    @JsonKey(fromJson: _toDouble) final double accuracy,
-    @JsonKey(name: 'f1_score', fromJson: _toDouble) final double f1Score,
-    @JsonKey(fromJson: _toDouble) final double precision,
-    @JsonKey(fromJson: _toDouble) final double recall,
-    @JsonKey(fromJson: _toDouble) final double auc,
-    @JsonKey(name: 'training_time', fromJson: _toDouble)
+    final double accuracy,
+    final double f1Score,
+    final double precision,
+    final double recall,
+    final double auc,
     final double trainingTime,
   }) = _$BenchmarkResultDtoImpl;
   const _BenchmarkResultDto._() : super._();
 
-  factory _BenchmarkResultDto.fromJson(Map<String, dynamic> json) =
-      _$BenchmarkResultDtoImpl.fromJson;
-
   @override
-  @JsonKey(name: 'model_name')
   String get modelName;
+  @override
+  String get displayName;
   @override
   String get category;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get accuracy;
   @override
-  @JsonKey(name: 'f1_score', fromJson: _toDouble)
   double get f1Score;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get precision;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get recall;
   @override
-  @JsonKey(fromJson: _toDouble)
   double get auc;
   @override
-  @JsonKey(name: 'training_time', fromJson: _toDouble)
   double get trainingTime;
 
   /// Create a copy of BenchmarkResultDto

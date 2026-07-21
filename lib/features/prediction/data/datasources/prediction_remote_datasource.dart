@@ -29,7 +29,10 @@ class PredictionRemoteDataSourceImpl implements PredictionRemoteDataSource {
         ApiEndpoints.predict,
         data: {'text': text, 'model_name': modelName},
       );
-      return PredictionResultDto.fromJson(response.data as Map<String, dynamic>);
+      // The backend wraps the verdict in an envelope: {"text_preview": ..., "result": {...}}.
+      final data = response.data as Map<String, dynamic>;
+      final result = data['result'] as Map<String, dynamic>? ?? data;
+      return PredictionResultDto.fromJson(result);
     });
   }
 

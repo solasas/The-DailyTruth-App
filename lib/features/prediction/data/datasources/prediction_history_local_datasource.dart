@@ -69,6 +69,7 @@ class PredictionHistoryLocalDataSourceImpl implements PredictionHistoryLocalData
               'fakeProbability': r.fakeProbability,
               'realProbability': r.realProbability,
               'modelName': r.modelName,
+              'displayName': r.displayName,
               'category': r.category,
             },
           )
@@ -95,6 +96,7 @@ class PredictionHistoryLocalDataSourceImpl implements PredictionHistoryLocalData
           fakeProbability: (r['fakeProbability'] as num).toDouble(),
           realProbability: (r['realProbability'] as num).toDouble(),
           modelName: r['modelName'] as String,
+          displayName: r['displayName'] as String? ?? r['modelName'] as String,
           category: r['category'] as String,
         );
       }).toList(),

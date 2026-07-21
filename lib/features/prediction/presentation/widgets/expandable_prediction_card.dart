@@ -48,7 +48,7 @@ class _ExpandablePredictionCardState extends State<ExpandablePredictionCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      result.modelName,
+                      result.displayName,
                       style: theme.textTheme.titleSmall,
                       overflow: TextOverflow.ellipsis,
                     ),

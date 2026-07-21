@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$ModelInfo {
   String get name => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
   bool get loaded => throw _privateConstructorUsedError;
   double get accuracy => throw _privateConstructorUsedError;
@@ -41,6 +42,7 @@ abstract class $ModelInfoCopyWith<$Res> {
   @useResult
   $Res call({
     String name,
+    String displayName,
     String category,
     bool loaded,
     double accuracy,
@@ -68,6 +70,7 @@ class _$ModelInfoCopyWithImpl<$Res, $Val extends ModelInfo>
   @override
   $Res call({
     Object? name = null,
+    Object? displayName = null,
     Object? category = null,
     Object? loaded = null,
     Object? accuracy = null,
@@ -82,6 +85,10 @@ class _$ModelInfoCopyWithImpl<$Res, $Val extends ModelInfo>
             name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
+                      as String,
+            displayName: null == displayName
+                ? _value.displayName
+                : displayName // ignore: cast_nullable_to_non_nullable
                       as String,
             category: null == category
                 ? _value.category
@@ -132,6 +139,7 @@ abstract class _$$ModelInfoImplCopyWith<$Res>
   @useResult
   $Res call({
     String name,
+    String displayName,
     String category,
     bool loaded,
     double accuracy,
@@ -158,6 +166,7 @@ class __$$ModelInfoImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? name = null,
+    Object? displayName = null,
     Object? category = null,
     Object? loaded = null,
     Object? accuracy = null,
@@ -172,6 +181,10 @@ class __$$ModelInfoImplCopyWithImpl<$Res>
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
+                  as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
                   as String,
         category: null == category
             ? _value.category
@@ -215,6 +228,7 @@ class __$$ModelInfoImplCopyWithImpl<$Res>
 class _$ModelInfoImpl extends _ModelInfo {
   const _$ModelInfoImpl({
     required this.name,
+    required this.displayName,
     required this.category,
     required this.loaded,
     required this.accuracy,
@@ -227,6 +241,8 @@ class _$ModelInfoImpl extends _ModelInfo {
 
   @override
   final String name;
+  @override
+  final String displayName;
   @override
   final String category;
   @override
@@ -246,7 +262,7 @@ class _$ModelInfoImpl extends _ModelInfo {
 
   @override
   String toString() {
-    return 'ModelInfo(name: $name, category: $category, loaded: $loaded, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, featureType: $featureType)';
+    return 'ModelInfo(name: $name, displayName: $displayName, category: $category, loaded: $loaded, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, featureType: $featureType)';
   }
 
   @override
@@ -255,6 +271,8 @@ class _$ModelInfoImpl extends _ModelInfo {
         (other.runtimeType == runtimeType &&
             other is _$ModelInfoImpl &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.loaded, loaded) || other.loaded == loaded) &&
@@ -273,6 +291,7 @@ class _$ModelInfoImpl extends _ModelInfo {
   int get hashCode => Object.hash(
     runtimeType,
     name,
+    displayName,
     category,
     loaded,
     accuracy,
@@ -295,6 +314,7 @@ class _$ModelInfoImpl extends _ModelInfo {
 abstract class _ModelInfo extends ModelInfo {
   const factory _ModelInfo({
     required final String name,
+    required final String displayName,
     required final String category,
     required final bool loaded,
     required final double accuracy,
@@ -308,6 +328,8 @@ abstract class _ModelInfo extends ModelInfo {
 
   @override
   String get name;
+  @override
+  String get displayName;
   @override
   String get category;
   @override

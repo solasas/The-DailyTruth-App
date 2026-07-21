@@ -73,8 +73,9 @@ class SoftCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Material(
-      color: theme.cardTheme.color,
+      color: Colors.transparent,
       borderRadius: BorderRadius.circular(borderRadius),
       child: InkWell(
         onTap: onTap,
@@ -82,10 +83,16 @@ class SoftCard extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
+            color: theme.cardTheme.color,
             borderRadius: BorderRadius.circular(borderRadius),
-            border: Border.all(
-              color: theme.dividerColor,
-            ),
+            border: Border.all(color: theme.dividerColor),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.05),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
           child: child,
         ),

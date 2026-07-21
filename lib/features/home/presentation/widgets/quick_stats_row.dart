@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/gradient_card.dart';
-import '../../../benchmark/domain/entities/benchmark_result.dart';
 
 /// Two-tile "Quick Statistics" row: best model name and its accuracy.
 class QuickStatsRow extends StatelessWidget {
-  const QuickStatsRow({super.key, required this.bestModel});
+  const QuickStatsRow({super.key, this.bestModelName, this.bestModelAccuracy});
 
-  final BenchmarkResult? bestModel;
+  final String? bestModelName;
+  final double? bestModelAccuracy;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class QuickStatsRow extends StatelessWidget {
             icon: Icons.emoji_events_rounded,
             iconColor: AppColors.warning,
             label: 'Best Model',
-            value: bestModel?.modelName ?? '—',
+            value: bestModelName ?? '—',
           ),
         ),
         const SizedBox(width: 12),
@@ -28,7 +28,7 @@ class QuickStatsRow extends StatelessWidget {
             icon: Icons.trending_up_rounded,
             iconColor: AppColors.success,
             label: 'Accuracy',
-            value: bestModel != null ? '${(bestModel!.accuracy * 100).toStringAsFixed(1)}%' : '—',
+            value: bestModelAccuracy != null ? '${(bestModelAccuracy! * 100).toStringAsFixed(1)}%' : '—',
           ),
         ),
       ],
@@ -56,8 +56,16 @@ class _StatTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: iconColor, size: 22),
-          const SizedBox(height: 10),
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(height: 12),
           Text(
             value,
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),

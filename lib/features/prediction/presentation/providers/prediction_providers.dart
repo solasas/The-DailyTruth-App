@@ -207,6 +207,7 @@ final filteredAllModelsResultsProvider = Provider.autoDispose<List<PredictionRes
   return prediction.results.where((result) {
     final matchesSearch =
         filter.search.isEmpty ||
+        result.displayName.toLowerCase().contains(filter.search.toLowerCase()) ||
         result.modelName.toLowerCase().contains(filter.search.toLowerCase());
     final matchesVerdict = switch (filter.verdictFilter) {
       ResultVerdictFilter.all => true,

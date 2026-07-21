@@ -22,7 +22,7 @@ class SinglePredictionResultScreen extends ConsumerWidget {
     return 'The DailyTruth analysis\n'
         'Verdict: ${result.label.label}\n'
         'Confidence: ${(result.confidence * 100).toStringAsFixed(1)}%\n'
-        'Model: ${result.modelName} (${result.category})';
+        'Model: ${result.displayName} (${result.category})';
   }
 
   @override
@@ -90,7 +90,7 @@ class SinglePredictionResultScreen extends ConsumerWidget {
                   children: [
                     Icon(Icons.psychology_alt_rounded, size: 18, color: Theme.of(context).hintColor),
                     const SizedBox(width: 8),
-                    Text('Model: ${result.modelName}', style: Theme.of(context).textTheme.bodyMedium),
+                    Text('Model: ${result.displayName}', style: Theme.of(context).textTheme.bodyMedium),
                   ],
                 ),
                 const SizedBox(height: 28),

@@ -18,16 +18,25 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$BenchmarkResult {
   String get modelName => throw _privateConstructorUsedError;
+  String get displayName => throw _privateConstructorUsedError;
   String get category => throw _privateConstructorUsedError;
   double get accuracy => throw _privateConstructorUsedError;
   double get f1Score => throw _privateConstructorUsedError;
   double get precision => throw _privateConstructorUsedError;
   double get recall => throw _privateConstructorUsedError;
   double get auc => throw _privateConstructorUsedError;
-  double get trainingTimeSeconds => throw _privateConstructorUsedError;
+
+  /// Null when unavailable (e.g. derived from the [isFallback] path,
+  /// which has no training-time data).
+  double? get trainingTimeSeconds => throw _privateConstructorUsedError;
 
   /// 1-based rank, assigned client-side after sorting by accuracy.
   int get rank => throw _privateConstructorUsedError;
+
+  /// True when this row was derived client-side from `GET /models`
+  /// because `GET /results` was unavailable — see
+  /// `benchmarkOrFallbackProvider`.
+  bool get isFallback => throw _privateConstructorUsedError;
 
   /// Create a copy of BenchmarkResult
   /// with the given fields replaced by the non-null parameter values.
@@ -45,14 +54,16 @@ abstract class $BenchmarkResultCopyWith<$Res> {
   @useResult
   $Res call({
     String modelName,
+    String displayName,
     String category,
     double accuracy,
     double f1Score,
     double precision,
     double recall,
     double auc,
-    double trainingTimeSeconds,
+    double? trainingTimeSeconds,
     int rank,
+    bool isFallback,
   });
 }
 
@@ -72,20 +83,26 @@ class _$BenchmarkResultCopyWithImpl<$Res, $Val extends BenchmarkResult>
   @override
   $Res call({
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
     Object? accuracy = null,
     Object? f1Score = null,
     Object? precision = null,
     Object? recall = null,
     Object? auc = null,
-    Object? trainingTimeSeconds = null,
+    Object? trainingTimeSeconds = freezed,
     Object? rank = null,
+    Object? isFallback = null,
   }) {
     return _then(
       _value.copyWith(
             modelName: null == modelName
                 ? _value.modelName
                 : modelName // ignore: cast_nullable_to_non_nullable
+                      as String,
+            displayName: null == displayName
+                ? _value.displayName
+                : displayName // ignore: cast_nullable_to_non_nullable
                       as String,
             category: null == category
                 ? _value.category
@@ -111,14 +128,18 @@ class _$BenchmarkResultCopyWithImpl<$Res, $Val extends BenchmarkResult>
                 ? _value.auc
                 : auc // ignore: cast_nullable_to_non_nullable
                       as double,
-            trainingTimeSeconds: null == trainingTimeSeconds
+            trainingTimeSeconds: freezed == trainingTimeSeconds
                 ? _value.trainingTimeSeconds
                 : trainingTimeSeconds // ignore: cast_nullable_to_non_nullable
-                      as double,
+                      as double?,
             rank: null == rank
                 ? _value.rank
                 : rank // ignore: cast_nullable_to_non_nullable
                       as int,
+            isFallback: null == isFallback
+                ? _value.isFallback
+                : isFallback // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -136,14 +157,16 @@ abstract class _$$BenchmarkResultImplCopyWith<$Res>
   @useResult
   $Res call({
     String modelName,
+    String displayName,
     String category,
     double accuracy,
     double f1Score,
     double precision,
     double recall,
     double auc,
-    double trainingTimeSeconds,
+    double? trainingTimeSeconds,
     int rank,
+    bool isFallback,
   });
 }
 
@@ -162,20 +185,26 @@ class __$$BenchmarkResultImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? modelName = null,
+    Object? displayName = null,
     Object? category = null,
     Object? accuracy = null,
     Object? f1Score = null,
     Object? precision = null,
     Object? recall = null,
     Object? auc = null,
-    Object? trainingTimeSeconds = null,
+    Object? trainingTimeSeconds = freezed,
     Object? rank = null,
+    Object? isFallback = null,
   }) {
     return _then(
       _$BenchmarkResultImpl(
         modelName: null == modelName
             ? _value.modelName
             : modelName // ignore: cast_nullable_to_non_nullable
+                  as String,
+        displayName: null == displayName
+            ? _value.displayName
+            : displayName // ignore: cast_nullable_to_non_nullable
                   as String,
         category: null == category
             ? _value.category
@@ -201,14 +230,18 @@ class __$$BenchmarkResultImplCopyWithImpl<$Res>
             ? _value.auc
             : auc // ignore: cast_nullable_to_non_nullable
                   as double,
-        trainingTimeSeconds: null == trainingTimeSeconds
+        trainingTimeSeconds: freezed == trainingTimeSeconds
             ? _value.trainingTimeSeconds
             : trainingTimeSeconds // ignore: cast_nullable_to_non_nullable
-                  as double,
+                  as double?,
         rank: null == rank
             ? _value.rank
             : rank // ignore: cast_nullable_to_non_nullable
                   as int,
+        isFallback: null == isFallback
+            ? _value.isFallback
+            : isFallback // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -219,18 +252,22 @@ class __$$BenchmarkResultImplCopyWithImpl<$Res>
 class _$BenchmarkResultImpl implements _BenchmarkResult {
   const _$BenchmarkResultImpl({
     required this.modelName,
+    required this.displayName,
     required this.category,
     required this.accuracy,
     required this.f1Score,
     required this.precision,
     required this.recall,
     required this.auc,
-    required this.trainingTimeSeconds,
+    this.trainingTimeSeconds,
     this.rank = 0,
+    this.isFallback = false,
   });
 
   @override
   final String modelName;
+  @override
+  final String displayName;
   @override
   final String category;
   @override
@@ -243,17 +280,27 @@ class _$BenchmarkResultImpl implements _BenchmarkResult {
   final double recall;
   @override
   final double auc;
+
+  /// Null when unavailable (e.g. derived from the [isFallback] path,
+  /// which has no training-time data).
   @override
-  final double trainingTimeSeconds;
+  final double? trainingTimeSeconds;
 
   /// 1-based rank, assigned client-side after sorting by accuracy.
   @override
   @JsonKey()
   final int rank;
 
+  /// True when this row was derived client-side from `GET /models`
+  /// because `GET /results` was unavailable — see
+  /// `benchmarkOrFallbackProvider`.
+  @override
+  @JsonKey()
+  final bool isFallback;
+
   @override
   String toString() {
-    return 'BenchmarkResult(modelName: $modelName, category: $category, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, trainingTimeSeconds: $trainingTimeSeconds, rank: $rank)';
+    return 'BenchmarkResult(modelName: $modelName, displayName: $displayName, category: $category, accuracy: $accuracy, f1Score: $f1Score, precision: $precision, recall: $recall, auc: $auc, trainingTimeSeconds: $trainingTimeSeconds, rank: $rank, isFallback: $isFallback)';
   }
 
   @override
@@ -263,6 +310,8 @@ class _$BenchmarkResultImpl implements _BenchmarkResult {
             other is _$BenchmarkResultImpl &&
             (identical(other.modelName, modelName) ||
                 other.modelName == modelName) &&
+            (identical(other.displayName, displayName) ||
+                other.displayName == displayName) &&
             (identical(other.category, category) ||
                 other.category == category) &&
             (identical(other.accuracy, accuracy) ||
@@ -274,13 +323,16 @@ class _$BenchmarkResultImpl implements _BenchmarkResult {
             (identical(other.auc, auc) || other.auc == auc) &&
             (identical(other.trainingTimeSeconds, trainingTimeSeconds) ||
                 other.trainingTimeSeconds == trainingTimeSeconds) &&
-            (identical(other.rank, rank) || other.rank == rank));
+            (identical(other.rank, rank) || other.rank == rank) &&
+            (identical(other.isFallback, isFallback) ||
+                other.isFallback == isFallback));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
     modelName,
+    displayName,
     category,
     accuracy,
     f1Score,
@@ -289,6 +341,7 @@ class _$BenchmarkResultImpl implements _BenchmarkResult {
     auc,
     trainingTimeSeconds,
     rank,
+    isFallback,
   );
 
   /// Create a copy of BenchmarkResult
@@ -306,18 +359,22 @@ class _$BenchmarkResultImpl implements _BenchmarkResult {
 abstract class _BenchmarkResult implements BenchmarkResult {
   const factory _BenchmarkResult({
     required final String modelName,
+    required final String displayName,
     required final String category,
     required final double accuracy,
     required final double f1Score,
     required final double precision,
     required final double recall,
     required final double auc,
-    required final double trainingTimeSeconds,
+    final double? trainingTimeSeconds,
     final int rank,
+    final bool isFallback,
   }) = _$BenchmarkResultImpl;
 
   @override
   String get modelName;
+  @override
+  String get displayName;
   @override
   String get category;
   @override
@@ -330,12 +387,21 @@ abstract class _BenchmarkResult implements BenchmarkResult {
   double get recall;
   @override
   double get auc;
+
+  /// Null when unavailable (e.g. derived from the [isFallback] path,
+  /// which has no training-time data).
   @override
-  double get trainingTimeSeconds;
+  double? get trainingTimeSeconds;
 
   /// 1-based rank, assigned client-side after sorting by accuracy.
   @override
   int get rank;
+
+  /// True when this row was derived client-side from `GET /models`
+  /// because `GET /results` was unavailable — see
+  /// `benchmarkOrFallbackProvider`.
+  @override
+  bool get isFallback;
 
   /// Create a copy of BenchmarkResult
   /// with the given fields replaced by the non-null parameter values.

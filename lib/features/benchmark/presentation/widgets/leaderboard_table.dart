@@ -86,13 +86,19 @@ class LeaderboardTable extends StatelessWidget {
                   ],
                 ),
               ),
-              DataCell(Text(result.modelName, overflow: TextOverflow.ellipsis)),
+              DataCell(Text(result.displayName, overflow: TextOverflow.ellipsis)),
               DataCell(Text('${(result.accuracy * 100).toStringAsFixed(1)}%')),
               DataCell(Text('${(result.f1Score * 100).toStringAsFixed(1)}%')),
               DataCell(Text('${(result.precision * 100).toStringAsFixed(1)}%')),
               DataCell(Text('${(result.recall * 100).toStringAsFixed(1)}%')),
               DataCell(Text('${(result.auc * 100).toStringAsFixed(1)}%')),
-              DataCell(Text('${result.trainingTimeSeconds.toStringAsFixed(1)}s')),
+              DataCell(
+                Text(
+                  result.trainingTimeSeconds != null
+                      ? '${result.trainingTimeSeconds!.toStringAsFixed(1)}s'
+                      : '—',
+                ),
+              ),
             ],
           );
         }).toList(),

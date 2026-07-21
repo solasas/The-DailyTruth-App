@@ -28,11 +28,11 @@ class AppColors {
   static const Color borderLight = Color(0xFFE5E7EB);
 
   // Dark theme surfaces
-  static const Color backgroundDark = Color(0xFF0F172A);
-  static const Color cardDark = Color(0xFF1E293B);
+  static const Color backgroundDark = Color(0xFF0A0F1E);
+  static const Color cardDark = Color(0xFF1A2540);
   static const Color textPrimaryDark = Color(0xFFF1F5F9);
   static const Color textSecondaryDark = Color(0xFF94A3B8);
-  static const Color borderDark = Color(0xFF334155);
+  static const Color borderDark = Color(0xFF2E3B5C);
 
   static const List<Color> primaryGradient = [
     Color(0xFF2563EB),
@@ -56,15 +56,27 @@ class AppColors {
   ];
 
   /// Category colors for repeatable model-category chips/badges.
-  static const Map<String, Color> categoryColors = {
-    'classical': Color(0xFF7C3AED),
-    'ensemble': Color(0xFF2563EB),
-    'deep_learning': Color(0xFFDB2777),
-    'transformer': Color(0xFF0891B2),
-  };
-
+  ///
+  /// Matched by substring rather than an exact key, since the backend's
+  /// category labels are free text (e.g. "Classical ML", "Deep Learning",
+  /// "Hybrid") rather than a fixed enum.
   static Color categoryColor(String category) {
-    return categoryColors[category.toLowerCase().replaceAll(' ', '_')] ??
-        primary;
+    final normalized = category.toLowerCase();
+    if (normalized.contains('deep') || normalized.contains('neural')) {
+      return const Color(0xFFDB2777);
+    }
+    if (normalized.contains('hybrid')) {
+      return const Color(0xFF0891B2);
+    }
+    if (normalized.contains('ensemble')) {
+      return const Color(0xFF16A34A);
+    }
+    if (normalized.contains('transformer') || normalized.contains('bert')) {
+      return const Color(0xFF0891B2);
+    }
+    if (normalized.contains('classical')) {
+      return const Color(0xFF7C3AED);
+    }
+    return primary;
   }
 }
