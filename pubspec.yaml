@@ -1,5 +1,5 @@
 name: the_daily_truth
-description: "The DailyTruth — AI-powered fake news detection platform."
+description: "The Paper Trail — AI-powered fake news detection platform."
 publish_to: 'none'
 
 version: 1.0.0+1

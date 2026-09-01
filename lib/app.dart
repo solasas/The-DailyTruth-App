@@ -7,8 +7,8 @@ import 'core/theme/app_theme.dart';
 import 'features/settings/presentation/providers/settings_providers.dart';
 
 /// Root widget: wires the theme mode and GoRouter into [MaterialApp.router].
-class TheDailyTruthApp extends ConsumerWidget {
-  const TheDailyTruthApp({super.key});
+class ThePaperTrailApp extends ConsumerWidget {
+  const ThePaperTrailApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

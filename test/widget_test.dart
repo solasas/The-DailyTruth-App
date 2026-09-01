@@ -22,7 +22,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-        child: const TheDailyTruthApp(),
+        child: const ThePaperTrailApp(),
       ),
     );
     // Advance past the dashboard cards' staggered FadeSlideIn entrance

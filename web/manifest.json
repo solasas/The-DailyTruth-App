@@ -1,11 +1,11 @@
 {
-    "name": "The DailyTruth",
-    "short_name": "DailyTruth",
+    "name": "The Paper Trail",
+    "short_name": "Paper Trail",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#F3F4F6",
     "theme_color": "#2563EB",
-    "description": "The DailyTruth — AI-powered fake news detection platform.",
+    "description": "The Paper Trail — AI-powered fake news detection platform.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

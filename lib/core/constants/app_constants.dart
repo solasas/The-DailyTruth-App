@@ -2,7 +2,7 @@
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'The DailyTruth';
+  static const String appName = 'The Paper Trail';
   static const String appTagline = 'AI-Powered Fake News Detection';
   static const String appVersion = '1.0.0';
 

@@ -1,4 +1,4 @@
-# The DailyTruth
+# The Paper Trail
 
 AI-powered fake news detection app built with Flutter. The backend (FastAPI-style ML serving API) is a separate project — this repository is the client only.
 

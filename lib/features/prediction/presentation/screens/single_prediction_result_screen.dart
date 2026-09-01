@@ -19,7 +19,7 @@ class SinglePredictionResultScreen extends ConsumerWidget {
   const SinglePredictionResultScreen({super.key});
 
   String _shareText(PredictionResult result) {
-    return 'The DailyTruth analysis\n'
+    return 'The Paper Trail analysis\n'
         'Verdict: ${result.label.label}\n'
         'Confidence: ${(result.confidence * 100).toStringAsFixed(1)}%\n'
         'Model: ${result.displayName} (${result.category})';

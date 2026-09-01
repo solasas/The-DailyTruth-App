@@ -17,7 +17,7 @@ Future<void> main() async {
       overrides: [
         sharedPreferencesProvider.overrideWithValue(sharedPreferences),
       ],
-      child: const TheDailyTruthApp(),
+      child: const ThePaperTrailApp(),
     ),
   );
 }
