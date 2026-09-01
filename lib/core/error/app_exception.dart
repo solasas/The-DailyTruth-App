@@ -27,7 +27,9 @@ sealed class AppException implements Exception {
           'No internet connection. Check your network and try again.',
         );
       case DioExceptionType.badCertificate:
-        return const ServerFailure('A secure connection could not be established.');
+        return const ServerFailure(
+          'A secure connection could not be established.',
+        );
       case DioExceptionType.cancel:
         return const RequestCancelledFailure('Request was cancelled.');
       case DioExceptionType.badResponse:
@@ -44,8 +46,19 @@ sealed class AppException implements Exception {
     final serverMessage = _extractServerMessage(error.response?.data);
 
     switch (status) {
+      case 401:
+        return UnauthorizedFailure(
+          serverMessage ?? 'Your session has expired. Please sign in again.',
+        );
+      case 403:
+        return ForbiddenFailure(
+          serverMessage ??
+              'Your account is not allowed to perform this action.',
+        );
       case 404:
-        return NotFoundFailure(serverMessage ?? 'The requested resource was not found.');
+        return NotFoundFailure(
+          serverMessage ?? 'The requested resource was not found.',
+        );
       case 422:
         return ValidationFailure(
           serverMessage ?? 'The submitted data is invalid.',
@@ -55,7 +68,9 @@ sealed class AppException implements Exception {
           'The text you submitted is too large. Try shortening it.',
         );
       case 500:
-        return ServerFailure(serverMessage ?? 'Something went wrong on the server.');
+        return ServerFailure(
+          serverMessage ?? 'Something went wrong on the server.',
+        );
       case 503:
         return const ServiceUnavailableFailure(
           'The prediction service is temporarily unavailable.',
@@ -89,6 +104,18 @@ class NotFoundFailure extends AppException {
   const NotFoundFailure(super.message);
 }
 
+/// HTTP 401 — the bearer token is missing, invalid or expired. The auth
+/// layer watches for this to drop the stored session and prompt re-login.
+class UnauthorizedFailure extends AppException {
+  const UnauthorizedFailure(super.message);
+}
+
+/// HTTP 403 — authenticated, but the account's role can't perform the action
+/// (e.g. an `analyst`-only endpoint hit with a different role).
+class ForbiddenFailure extends AppException {
+  const ForbiddenFailure(super.message);
+}
+
 class ValidationFailure extends AppException {
   const ValidationFailure(super.message);
 }
@@ -110,7 +137,9 @@ class RequestCancelledFailure extends AppException {
 }
 
 class InvalidDataFailure extends AppException {
-  const InvalidDataFailure([super.message = 'Received malformed data from the server.']);
+  const InvalidDataFailure([
+    super.message = 'Received malformed data from the server.',
+  ]);
 }
 
 class UnknownFailure extends AppException {

@@ -36,7 +36,9 @@ class ModelInfoDto with _$ModelInfoDto {
       category: json['category'] as String? ?? 'unknown',
       loaded: json['loaded'] as bool? ?? false,
       accuracy: _toDouble(metrics['accuracy'] ?? json['accuracy']),
-      f1Score: _toDouble(metrics['f1'] ?? metrics['f1_score'] ?? json['f1_score']),
+      f1Score: _toDouble(
+        metrics['f1'] ?? metrics['f1_score'] ?? json['f1_score'],
+      ),
       precision: _toDouble(metrics['precision'] ?? json['precision']),
       recall: _toDouble(metrics['recall'] ?? json['recall']),
       auc: _toDouble(metrics['auc'] ?? json['auc']),

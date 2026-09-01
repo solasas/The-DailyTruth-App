@@ -1,27 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../../core/widgets/empty_state.dart';
+import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/animated_confidence_ring.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/fade_slide_in.dart';
+import '../../../../core/widgets/status_badge.dart';
+import '../../domain/entities/prediction_result.dart';
 import '../providers/prediction_providers.dart';
-import '../widgets/consensus_card.dart';
-import '../widgets/expandable_prediction_card.dart';
+import '../widgets/model_result_bar.dart';
+import '../widgets/verdict_visuals.dart';
 
-/// Displays the consensus verdict plus every individual model's result from
-/// `POST /predict/all`, with search + verdict/category filters.
-class AllModelsResultScreen extends ConsumerWidget {
+/// The consensus verdict from `POST /predict/all`: a confidence ring, a
+/// verdict badge, and a per-model breakdown.
+class AllModelsResultScreen extends ConsumerStatefulWidget {
   const AllModelsResultScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AllModelsResultScreen> createState() =>
+      _AllModelsResultScreenState();
+}
+
+class _AllModelsResultScreenState extends ConsumerState<AllModelsResultScreen> {
+  bool _flagged = false;
+
+  void _newCheck() {
+    ref.read(allModelsPredictionProvider.notifier).reset();
+    context.go('/analyze');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final state = ref.watch(allModelsPredictionProvider);
-    final filter = ref.watch(allModelsFilterProvider);
-    final filterNotifier = ref.read(allModelsFilterProvider.notifier);
-    final filteredResults = ref.watch(filteredAllModelsResultsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('All Model Analysis')),
+      appBar: AppBar(title: const Text('Result')),
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => ErrorView(error: error),
@@ -29,84 +44,78 @@ class AllModelsResultScreen extends ConsumerWidget {
           if (prediction == null) {
             return const ErrorView(error: 'No result available.');
           }
-
-          final categories = prediction.results.map((r) => r.category).toSet().toList()..sort();
+          final label = prediction.consensusLabel;
+          final color = label.color;
+          final fakeCount = prediction.results
+              .where((r) => r.label == PredictionLabel.fake)
+              .length;
+          final total = prediction.results.length;
 
           return ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
             children: [
               FadeSlideIn(
-                child: ConsensusCard(
-                  label: prediction.consensusLabel,
-                  confidence: prediction.consensusConfidence,
-                  modelCount: prediction.results.length,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                onChanged: filterNotifier.setSearch,
-                decoration: const InputDecoration(
-                  hintText: 'Search model…',
-                  prefixIcon: Icon(Icons.search_rounded),
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 40,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    ChoiceChip(
-                      label: const Text('All'),
-                      selected: filter.verdictFilter == ResultVerdictFilter.all,
-                      onSelected: (_) => filterNotifier.setVerdictFilter(ResultVerdictFilter.all),
-                    ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      label: const Text('Only Fake'),
-                      selected: filter.verdictFilter == ResultVerdictFilter.onlyFake,
-                      onSelected: (_) =>
-                          filterNotifier.setVerdictFilter(ResultVerdictFilter.onlyFake),
-                    ),
-                    const SizedBox(width: 8),
-                    ChoiceChip(
-                      label: const Text('Only Real'),
-                      selected: filter.verdictFilter == ResultVerdictFilter.onlyReal,
-                      onSelected: (_) =>
-                          filterNotifier.setVerdictFilter(ResultVerdictFilter.onlyReal),
-                    ),
-                    const SizedBox(width: 8),
-                    ...categories.map(
-                      (category) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: ChoiceChip(
-                          label: Text(category),
-                          selected: filter.category == category,
-                          onSelected: (_) => filterNotifier.setCategory(
-                            filter.category == category ? null : category,
-                          ),
-                        ),
+                child: Center(
+                  child: Column(
+                    children: [
+                      AnimatedConfidenceRing(
+                        value: prediction.consensusConfidence,
+                        color: color,
+                        size: 140,
+                        strokeWidth: 12,
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (filteredResults.isEmpty)
-                const EmptyState(
-                  icon: Icons.filter_alt_off_rounded,
-                  title: 'No models match your filters',
-                )
-              else
-                ...filteredResults.asMap().entries.map(
-                  (entry) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: FadeSlideIn(
-                      delay: Duration(milliseconds: 30 * entry.key),
-                      child: ExpandablePredictionCard(result: entry.value),
-                    ),
+                      const SizedBox(height: 16),
+                      StatusBadge(
+                        label: label.label,
+                        color: color,
+                        icon: label.icon,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '$fakeCount of $total models flagged this as fake.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
                   ),
                 ),
+              ),
+              const SizedBox(height: 28),
+              Text('Per-model results', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 4),
+              for (final result in prediction.results)
+                ModelResultBar(result: result),
+              const SizedBox(height: 28),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _flagged
+                          ? null
+                          : () {
+                              setState(() => _flagged = true);
+                              SnackbarUtils.showInfo(
+                                context,
+                                'Flagged for analyst review',
+                              );
+                            },
+                      icon: Icon(
+                        _flagged
+                            ? Icons.check_rounded
+                            : Icons.outlined_flag_rounded,
+                      ),
+                      label: Text(_flagged ? 'Flagged' : 'Flag for review'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: _newCheck,
+                      child: const Text('New check'),
+                    ),
+                  ),
+                ],
+              ),
             ],
           );
         },

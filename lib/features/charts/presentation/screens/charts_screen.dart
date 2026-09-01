@@ -56,7 +56,8 @@ class ChartsScreen extends ConsumerWidget {
                 final chart = charts[index];
                 return ChartThumbnail(
                   chart: chart,
-                  onTap: () => context.push('/charts/${chart.name}', extra: chart.title),
+                  onTap: () =>
+                      context.push('/charts/${chart.name}', extra: chart.title),
                 );
               },
             );

@@ -13,6 +13,7 @@ class PredictionHistoryEntry with _$PredictionHistoryEntry {
     required String text,
     required DateTime timestamp,
     required bool isAllModels,
+
     /// For single-model runs this has exactly one entry; for all-models runs
     /// it holds every per-model result plus the consensus is derivable from
     /// [consensusLabel]/[consensusConfidence].

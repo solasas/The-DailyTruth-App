@@ -8,10 +8,12 @@ class PredictionHistoryRepositoryImpl implements PredictionHistoryRepository {
   final PredictionHistoryLocalDataSource _localDataSource;
 
   @override
-  Future<List<PredictionHistoryEntry>> getHistory() => _localDataSource.getAll();
+  Future<List<PredictionHistoryEntry>> getHistory() =>
+      _localDataSource.getAll();
 
   @override
-  Future<void> save(PredictionHistoryEntry entry) => _localDataSource.add(entry);
+  Future<void> save(PredictionHistoryEntry entry) =>
+      _localDataSource.add(entry);
 
   @override
   Future<void> delete(String id) => _localDataSource.delete(id);

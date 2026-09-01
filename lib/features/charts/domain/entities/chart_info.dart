@@ -7,5 +7,6 @@ part 'chart_info.freezed.dart';
 /// `GET /results/charts/{name}`).
 @freezed
 class ChartInfo with _$ChartInfo {
-  const factory ChartInfo({required String name, required String title}) = _ChartInfo;
+  const factory ChartInfo({required String name, required String title}) =
+      _ChartInfo;
 }

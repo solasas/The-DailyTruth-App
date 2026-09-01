@@ -1,82 +1,110 @@
 import 'package:flutter/material.dart';
 
-/// Brand color palette shared by the light and dark themes.
+/// "Organic" brand palette — warm cream grounds, terracotta as the
+/// alert/"fake" voice, sage as the verified/"real" voice, plus a warm
+/// neutral ramp. Shared by the light and dark themes.
 ///
-/// Semantic colors (success/warning/error) stay constant across themes so
-/// that a "FAKE" verdict always reads as red regardless of theme mode.
+/// Semantic roles stay constant across themes so a "fake" verdict always
+/// reads as terracotta and a "real" verdict as sage regardless of mode.
 class AppColors {
   AppColors._();
 
-  static const Color primary = Color(0xFF2563EB);
-  static const Color primaryDark = Color(0xFF1D4ED8);
-  static const Color primaryLight = Color(0xFF60A5FA);
+  // --- Terracotta ramp (accent / "fake" / alert voice) ---
+  static const Color accent100 = Color(0xFFFFF2EB);
+  static const Color accent300 = Color(0xFFE7A87E);
+  static const Color accent500 = Color(0xFFC67139);
+  static const Color accent700 = Color(0xFF8A4A24);
+  static const Color accent800 = Color(0xFF643312);
 
-  static const Color success = Color(0xFF16A34A);
-  static const Color successLight = Color(0xFFDCFCE7);
+  // --- Sage ramp (accent-2 / "real" / verified voice) ---
+  static const Color sage100 = Color(0xFFF0FAE1);
+  static const Color sage300 = Color(0xFFAFBE8F);
+  static const Color sage500 = Color(0xFF7A8A5E);
+  static const Color sage700 = Color(0xFF556141);
+  static const Color sage800 = Color(0xFF3D472B);
 
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color warningLight = Color(0xFFFEF3C7);
+  // --- Warm neutral ramp ---
+  static const Color neutral100 = Color(0xFFF9F4ED);
+  static const Color neutral200 = Color(0xFFEEE7DB);
+  static const Color neutral300 = Color(0xFFDCD3C4);
+  static const Color neutral400 = Color(0xFFC0B6A5);
+  static const Color neutral600 = Color(0xFF82796A);
+  static const Color neutral800 = Color(0xFF474238);
 
-  static const Color error = Color(0xFFDC2626);
-  static const Color errorLight = Color(0xFFFEE2E2);
+  static const Color ink = Color(0xFF201E1D);
 
-  // Light theme surfaces
-  static const Color backgroundLight = Color(0xFFF3F4F6);
-  static const Color cardLight = Color(0xFFFFFFFF);
-  static const Color textPrimaryLight = Color(0xFF111827);
-  static const Color textSecondaryLight = Color(0xFF6B7280);
-  static const Color borderLight = Color(0xFFE5E7EB);
+  // --- Primary (maps to terracotta) ---
+  static const Color primary = accent500;
+  static const Color primaryDark = accent700;
+  static const Color primaryLight = accent300;
 
-  // Dark theme surfaces
-  static const Color backgroundDark = Color(0xFF0A0F1E);
-  static const Color cardDark = Color(0xFF1A2540);
-  static const Color textPrimaryDark = Color(0xFFF1F5F9);
-  static const Color textSecondaryDark = Color(0xFF94A3B8);
-  static const Color borderDark = Color(0xFF2E3B5C);
+  // --- Semantic (constant across themes) ---
+  static const Color success = sage500; // "likely real"
+  static const Color successLight = sage100;
+
+  static const Color warning = neutral600; // "uncertain"
+  static const Color warningLight = neutral200;
+
+  static const Color error = accent500; // "likely fake"
+  static const Color errorLight = accent100;
+
+  // --- Light theme surfaces ---
+  static const Color backgroundLight = Color(0xFFF5EAD8);
+  static const Color cardLight = Color(0xFFFBF4E8);
+  static const Color surfaceSunkenLight = Color(0xFFEBDDC5);
+  static const Color textPrimaryLight = ink;
+  static const Color textSecondaryLight = neutral600;
+  static const Color borderLight = neutral300;
+
+  // --- Dark theme surfaces (warm charcoal, not blue-black) ---
+  static const Color backgroundDark = Color(0xFF201E1D);
+  static const Color cardDark = Color(0xFF2B2723);
+  static const Color surfaceSunkenDark = Color(0xFF34302B);
+  static const Color textPrimaryDark = Color(0xFFF5EAD8);
+  static const Color textSecondaryDark = Color(0xFFC0B6A5);
+  static const Color borderDark = Color(0xFF474238);
+
+  /// Ink-tinted shadow, used by cards/sheets instead of pure black.
+  static Color shadow(double opacity) => ink.withValues(alpha: opacity);
 
   static const List<Color> primaryGradient = [
-    Color(0xFF2563EB),
-    Color(0xFF3B82F6),
-    Color(0xFF60A5FA),
+    Color(0xFFC67139),
+    Color(0xFFD98F55),
+    Color(0xFFE7A87E),
   ];
 
   static const List<Color> successGradient = [
-    Color(0xFF16A34A),
-    Color(0xFF22C55E),
+    Color(0xFF7A8A5E),
+    Color(0xFF93A277),
   ];
 
   static const List<Color> errorGradient = [
-    Color(0xFFDC2626),
-    Color(0xFFEF4444),
+    Color(0xFFC67139),
+    Color(0xFFD98F55),
   ];
 
   static const List<Color> warningGradient = [
-    Color(0xFFF59E0B),
-    Color(0xFFFBBF24),
+    Color(0xFF9A8F7C),
+    Color(0xFFB7AC98),
   ];
 
-  /// Category colors for repeatable model-category chips/badges.
-  ///
-  /// Matched by substring rather than an exact key, since the backend's
-  /// category labels are free text (e.g. "Classical ML", "Deep Learning",
-  /// "Hybrid") rather than a fixed enum.
+  /// Category colors for model-category chips/badges. The prototype defines a
+  /// 3-way mapping (Classical ML → neutral, Deep Learning → accent, Hybrid →
+  /// accent-2); other categories fall back along the same three voices.
   static Color categoryColor(String category) {
     final normalized = category.toLowerCase();
-    if (normalized.contains('deep') || normalized.contains('neural')) {
-      return const Color(0xFFDB2777);
+    if (normalized.contains('deep') ||
+        normalized.contains('neural') ||
+        normalized.contains('transformer') ||
+        normalized.contains('bert')) {
+      return accent500;
     }
-    if (normalized.contains('hybrid')) {
-      return const Color(0xFF0891B2);
-    }
-    if (normalized.contains('ensemble')) {
-      return const Color(0xFF16A34A);
-    }
-    if (normalized.contains('transformer') || normalized.contains('bert')) {
-      return const Color(0xFF0891B2);
+    if (normalized.contains('hybrid') || normalized.contains('ensemble')) {
+      return sage500;
     }
     if (normalized.contains('classical')) {
-      return const Color(0xFF7C3AED);
+      return neutral600;
     }
-    return primary;
+    return neutral600;
   }
 }

@@ -52,7 +52,10 @@ void main() {
         type: DioExceptionType.badResponse,
         response: Response(requestOptions: options(), statusCode: 413),
       );
-      expect(AppException.fromDioException(error), isA<PayloadTooLargeFailure>());
+      expect(
+        AppException.fromDioException(error),
+        isA<PayloadTooLargeFailure>(),
+      );
     });
 
     test('maps HTTP 503 to ServiceUnavailableFailure', () {
@@ -61,7 +64,10 @@ void main() {
         type: DioExceptionType.badResponse,
         response: Response(requestOptions: options(), statusCode: 503),
       );
-      expect(AppException.fromDioException(error), isA<ServiceUnavailableFailure>());
+      expect(
+        AppException.fromDioException(error),
+        isA<ServiceUnavailableFailure>(),
+      );
     });
 
     test('maps HTTP 500 to ServerFailure', () {

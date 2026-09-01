@@ -6,7 +6,8 @@ import 'package:the_daily_truth/features/prediction/data/models/prediction_resul
 import 'package:the_daily_truth/features/prediction/data/repositories/prediction_repository_impl.dart';
 import 'package:the_daily_truth/features/prediction/domain/entities/prediction_result.dart';
 
-class MockPredictionRemoteDataSource extends Mock implements PredictionRemoteDataSource {}
+class MockPredictionRemoteDataSource extends Mock
+    implements PredictionRemoteDataSource {}
 
 void main() {
   late MockPredictionRemoteDataSource remoteDataSource;
@@ -19,8 +20,13 @@ void main() {
 
   group('PredictionRepositoryImpl.predict', () {
     test('maps a fake verdict DTO to a PredictionLabel.fake entity', () async {
-      when(() => remoteDataSource.predict(text: any(named: 'text'), modelName: any(named: 'modelName')))
-          .thenAnswer(
+      when(
+        () => remoteDataSource.predict(
+          text: any(named: 'text'),
+          modelName: any(named: 'modelName'),
+          threshold: any(named: 'threshold'),
+        ),
+      ).thenAnswer(
         (_) async => const PredictionResultDto(
           label: 'fake',
           confidence: 0.87,
@@ -32,7 +38,10 @@ void main() {
         ),
       );
 
-      final result = await repository.predict(text: 'some article', modelName: 'bert');
+      final result = await repository.predict(
+        text: 'some article',
+        modelName: 'bert',
+      );
 
       expect(result.label, PredictionLabel.fake);
       expect(result.confidence, 0.87);
@@ -41,8 +50,13 @@ void main() {
     });
 
     test('maps a real verdict DTO to a PredictionLabel.real entity', () async {
-      when(() => remoteDataSource.predict(text: any(named: 'text'), modelName: any(named: 'modelName')))
-          .thenAnswer(
+      when(
+        () => remoteDataSource.predict(
+          text: any(named: 'text'),
+          modelName: any(named: 'modelName'),
+          threshold: any(named: 'threshold'),
+        ),
+      ).thenAnswer(
         (_) async => const PredictionResultDto(
           label: 'real',
           confidence: 0.75,
@@ -54,7 +68,10 @@ void main() {
         ),
       );
 
-      final result = await repository.predict(text: 'some article', modelName: 'linear_svm');
+      final result = await repository.predict(
+        text: 'some article',
+        modelName: 'linear_svm',
+      );
 
       expect(result.label, PredictionLabel.real);
     });
@@ -62,7 +79,12 @@ void main() {
 
   group('PredictionRepositoryImpl.predictAll', () {
     test('maps consensus + per-model results', () async {
-      when(() => remoteDataSource.predictAll(text: any(named: 'text'))).thenAnswer(
+      when(
+        () => remoteDataSource.predictAll(
+          text: any(named: 'text'),
+          threshold: any(named: 'threshold'),
+        ),
+      ).thenAnswer(
         (_) async => const AllModelsPredictionDto(
           consensus: 'fake',
           consensusConfidence: 0.8,

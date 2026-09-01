@@ -12,7 +12,11 @@ import '../providers/charts_providers.dart';
 
 /// Full-screen, pinch-to-zoom chart viewer with a save/share action.
 class ChartFullscreenScreen extends ConsumerWidget {
-  const ChartFullscreenScreen({super.key, required this.chartName, required this.title});
+  const ChartFullscreenScreen({
+    super.key,
+    required this.chartName,
+    required this.title,
+  });
 
   final String chartName;
   final String title;
@@ -52,7 +56,8 @@ class ChartFullscreenScreen extends ConsumerWidget {
         ],
       ),
       body: imageAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: Colors.white)),
+        loading: () =>
+            const Center(child: CircularProgressIndicator(color: Colors.white)),
         error: (error, _) => ErrorView(error: error),
         data: (bytes) => Hero(
           tag: 'chart-$chartName',

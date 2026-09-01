@@ -1,4 +1,4 @@
-# The Paper Trail
+# The Daily Truth
 
 AI-powered fake news detection app built with Flutter. The backend (FastAPI-style ML serving API) is a separate project — this repository is the client only.
 
@@ -40,7 +40,7 @@ core/
   widgets/     # Reusable UI: cards, shimmer skeletons, error/empty states, animated bars & rings
 ```
 
-Features: `home`, `prediction` (Analyze + results + local history), `models`, `benchmark` (Leaderboard), `charts`, `settings`.
+Features: `home`, `prediction` (Analyze + results + local history), `models` (+ registry), `benchmark` (Leaderboard), `charts`, `auth` (JWT sign-in), `articles` (agentic verification), `review` (analyst queue), `settings`.
 
 Data flows one way: **Screen → Provider → Repository → DataSource → Dio/Hive**. Screens never call Dio or Hive directly, and domain entities never carry JSON annotations — only the `data/models/*_dto.dart` files know about the wire format.
 
@@ -79,7 +79,17 @@ Includes repository unit tests (mocked datasources via `mocktail`), an `AppExcep
 | `GET /results` | Leaderboard |
 | `GET /results/charts` | Charts gallery |
 | `GET /results/charts/{name}` | Chart image bytes (thumbnail + fullscreen viewer) |
+| `GET /models/registry` | Model Registry screen (training metrics + per-model chart artefacts) |
+| `POST /auth/token` | Sign-in screen (demo accounts `admin/admin123`, `analyst/analyst123`); token held in `TokenStore`, attached by `DioClient` and silently refreshed on `401` |
+| `POST /articles/submit` (Bearer) | "Verify an article" → returns `202` + id |
+| `GET /articles/{id}` | Verdict screen — polled every ~1.5s (see `AppConstants.verificationPollInterval`) until `completed`/`failed`, `TimeoutFailure` after `verificationTimeout` |
+| `GET /review-queue` | Analyst review queue (paginated, infinite scroll, status filter) |
+| `POST /review-queue/{id}/resolve` (Bearer) | Resolve sheet — analyst decision (`real`/`fake`/`uncertain`) + note |
 | `GET /` | Not surfaced in the UI; wire it up in `HomeRemoteDataSource` if you need a root/status probe |
+
+### Auth model
+
+`POST /auth/token` returns `{access_token, token_type, role}`. The raw token lives in a process-wide `TokenStore` (core), which `DioClient` reads on every request and refreshes once on a `401` using credentials cached in `SharedPreferences` (demo-grade — a production build should move these to `flutter_secure_storage`). Reading the models/leaderboard/queue is open; `POST /articles/submit` and `POST /review-queue/{id}/resolve` require a bearer token, and the relevant screens show a sign-in CTA when signed out.
 
 Backend response shapes are parsed leniently (bare arrays or `{"models": [...]}`/`{"results": [...]}` envelopes, numeric-or-string metric fields) so minor backend contract drift doesn't break parsing outright — genuinely unexpected shapes raise a typed `AppException` instead of a raw crash.
 

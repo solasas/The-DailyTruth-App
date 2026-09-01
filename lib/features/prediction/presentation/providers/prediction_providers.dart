@@ -15,12 +15,16 @@ import '../../domain/repositories/prediction_repository.dart';
 
 const _uuid = Uuid();
 
-final predictionRemoteDataSourceProvider = Provider<PredictionRemoteDataSource>((ref) {
-  return PredictionRemoteDataSourceImpl(ref.watch(dioClientProvider));
-});
+final predictionRemoteDataSourceProvider = Provider<PredictionRemoteDataSource>(
+  (ref) {
+    return PredictionRemoteDataSourceImpl(ref.watch(dioClientProvider));
+  },
+);
 
 final predictionRepositoryProvider = Provider<PredictionRepository>((ref) {
-  return PredictionRepositoryImpl(ref.watch(predictionRemoteDataSourceProvider));
+  return PredictionRepositoryImpl(
+    ref.watch(predictionRemoteDataSourceProvider),
+  );
 });
 
 final predictionHistoryLocalDataSourceProvider =
@@ -30,23 +34,23 @@ final predictionHistoryLocalDataSourceProvider =
       );
     });
 
-final predictionHistoryRepositoryProvider = Provider<PredictionHistoryRepository>((
-  ref,
-) {
-  return PredictionHistoryRepositoryImpl(
-    ref.watch(predictionHistoryLocalDataSourceProvider),
-  );
-});
+final predictionHistoryRepositoryProvider =
+    Provider<PredictionHistoryRepository>((ref) {
+      return PredictionHistoryRepositoryImpl(
+        ref.watch(predictionHistoryLocalDataSourceProvider),
+      );
+    });
 
 /// All locally-stored prediction history, most recent first.
-final predictionHistoryProvider = FutureProvider.autoDispose<List<PredictionHistoryEntry>>((
-  ref,
-) async {
-  final repository = ref.watch(predictionHistoryRepositoryProvider);
-  return repository.getHistory();
-});
+final predictionHistoryProvider =
+    FutureProvider.autoDispose<List<PredictionHistoryEntry>>((ref) async {
+      final repository = ref.watch(predictionHistoryRepositoryProvider);
+      return repository.getHistory();
+    });
 
-final historySearchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
+final historySearchQueryProvider = StateProvider.autoDispose<String>(
+  (ref) => '',
+);
 
 final filteredPredictionHistoryProvider =
     Provider.autoDispose<AsyncValue<List<PredictionHistoryEntry>>>((ref) {
@@ -55,7 +59,9 @@ final filteredPredictionHistoryProvider =
 
       return historyAsync.whenData((entries) {
         if (query.isEmpty) return entries;
-        return entries.where((e) => e.text.toLowerCase().contains(query)).toList();
+        return entries
+            .where((e) => e.text.toLowerCase().contains(query))
+            .toList();
       });
     });
 
@@ -66,22 +72,53 @@ final analyzeTextProvider = StateProvider.autoDispose<String>((ref) => '');
 
 final analyzeTextValidProvider = Provider.autoDispose<bool>((ref) {
   final length = ref.watch(analyzeTextProvider).trim().length;
-  return length >= AppConstants.minAnalysisLength && length <= AppConstants.maxAnalysisLength;
+  return length >= AppConstants.minAnalysisLength &&
+      length <= AppConstants.maxAnalysisLength;
 });
 
 /// Currently selected model on the Analyze screen's dropdown.
 final selectedModelProvider = StateProvider.autoDispose<String?>((ref) => null);
 
+/// The three ways to run a check on the Check screen.
+enum CheckMode { single, consensus, batch }
+
+extension CheckModeX on CheckMode {
+  String get label => switch (this) {
+    CheckMode.single => 'Single',
+    CheckMode.consensus => 'Consensus',
+    CheckMode.batch => 'Batch',
+  };
+
+  /// Whether this mode needs a model picked (Consensus runs every model).
+  bool get needsModel => this != CheckMode.consensus;
+}
+
+final checkModeProvider = StateProvider.autoDispose<CheckMode>(
+  (ref) => CheckMode.single,
+);
+
+/// Decision threshold (0.0–1.0, default 0.5) sent with every predict call.
+final thresholdProvider = StateProvider.autoDispose<double>((ref) => 0.5);
+
 /// Runs a single-model prediction and persists it to history on success.
-class SinglePredictionNotifier extends AutoDisposeAsyncNotifier<PredictionResult?> {
+class SinglePredictionNotifier
+    extends AutoDisposeAsyncNotifier<PredictionResult?> {
   @override
   Future<PredictionResult?> build() async => null;
 
-  Future<void> analyze({required String text, required String modelName}) async {
+  Future<void> analyze({
+    required String text,
+    required String modelName,
+    double threshold = 0.5,
+  }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repository = ref.read(predictionRepositoryProvider);
-      final result = await repository.predict(text: text, modelName: modelName);
+      final result = await repository.predict(
+        text: text,
+        modelName: modelName,
+        threshold: threshold,
+      );
 
       await ref
           .read(predictionHistoryRepositoryProvider)
@@ -103,9 +140,10 @@ class SinglePredictionNotifier extends AutoDisposeAsyncNotifier<PredictionResult
 }
 
 final singlePredictionProvider =
-    AsyncNotifierProvider.autoDispose<SinglePredictionNotifier, PredictionResult?>(
-      SinglePredictionNotifier.new,
-    );
+    AsyncNotifierProvider.autoDispose<
+      SinglePredictionNotifier,
+      PredictionResult?
+    >(SinglePredictionNotifier.new);
 
 /// Runs an all-models prediction and persists the consensus + breakdown to
 /// history on success.
@@ -114,11 +152,17 @@ class AllModelsPredictionNotifier
   @override
   Future<AllModelsPrediction?> build() async => null;
 
-  Future<void> analyzeAll({required String text}) async {
+  Future<void> analyzeAll({
+    required String text,
+    double threshold = 0.5,
+  }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repository = ref.read(predictionRepositoryProvider);
-      final result = await repository.predictAll(text: text);
+      final result = await repository.predictAll(
+        text: text,
+        threshold: threshold,
+      );
 
       await ref
           .read(predictionHistoryRepositoryProvider)
@@ -141,10 +185,11 @@ class AllModelsPredictionNotifier
   void reset() => state = const AsyncData(null);
 }
 
-final allModelsPredictionProvider = AsyncNotifierProvider.autoDispose<
-  AllModelsPredictionNotifier,
-  AllModelsPrediction?
->(AllModelsPredictionNotifier.new);
+final allModelsPredictionProvider =
+    AsyncNotifierProvider.autoDispose<
+      AllModelsPredictionNotifier,
+      AllModelsPrediction?
+    >(AllModelsPredictionNotifier.new);
 
 enum ResultVerdictFilter { all, onlyFake, onlyReal }
 
@@ -173,7 +218,8 @@ class AllModelsFilterState {
   }
 }
 
-class AllModelsFilterNotifier extends AutoDisposeNotifier<AllModelsFilterState> {
+class AllModelsFilterNotifier
+    extends AutoDisposeNotifier<AllModelsFilterState> {
   @override
   AllModelsFilterState build() => const AllModelsFilterState();
 
@@ -196,25 +242,74 @@ final allModelsFilterProvider =
 
 /// Applies [allModelsFilterProvider] on top of the current
 /// [allModelsPredictionProvider] results list.
-final filteredAllModelsResultsProvider = Provider.autoDispose<List<PredictionResult>>((
-  ref,
-) {
-  final prediction = ref.watch(allModelsPredictionProvider).valueOrNull;
-  if (prediction == null) return const [];
+final filteredAllModelsResultsProvider =
+    Provider.autoDispose<List<PredictionResult>>((ref) {
+      final prediction = ref.watch(allModelsPredictionProvider).valueOrNull;
+      if (prediction == null) return const [];
 
-  final filter = ref.watch(allModelsFilterProvider);
+      final filter = ref.watch(allModelsFilterProvider);
 
-  return prediction.results.where((result) {
-    final matchesSearch =
-        filter.search.isEmpty ||
-        result.displayName.toLowerCase().contains(filter.search.toLowerCase()) ||
-        result.modelName.toLowerCase().contains(filter.search.toLowerCase());
-    final matchesVerdict = switch (filter.verdictFilter) {
-      ResultVerdictFilter.all => true,
-      ResultVerdictFilter.onlyFake => result.label == PredictionLabel.fake,
-      ResultVerdictFilter.onlyReal => result.label == PredictionLabel.real,
-    };
-    final matchesCategory = filter.category == null || result.category == filter.category;
-    return matchesSearch && matchesVerdict && matchesCategory;
-  }).toList();
-});
+      return prediction.results.where((result) {
+        final matchesSearch =
+            filter.search.isEmpty ||
+            result.displayName.toLowerCase().contains(
+              filter.search.toLowerCase(),
+            ) ||
+            result.modelName.toLowerCase().contains(
+              filter.search.toLowerCase(),
+            );
+        final matchesVerdict = switch (filter.verdictFilter) {
+          ResultVerdictFilter.all => true,
+          ResultVerdictFilter.onlyFake => result.label == PredictionLabel.fake,
+          ResultVerdictFilter.onlyReal => result.label == PredictionLabel.real,
+        };
+        final matchesCategory =
+            filter.category == null || result.category == filter.category;
+        return matchesSearch && matchesVerdict && matchesCategory;
+      }).toList();
+    });
+
+/// One item's outcome in a batch run.
+class BatchItemResult {
+  const BatchItemResult({required this.text, required this.result});
+
+  final String text;
+  final PredictionResult result;
+}
+
+/// Runs `POST /predict/batch` for up to 100 texts against one model.
+class BatchPredictionNotifier
+    extends AutoDisposeAsyncNotifier<List<BatchItemResult>?> {
+  @override
+  Future<List<BatchItemResult>?> build() async => null;
+
+  Future<void> run({
+    required List<String> texts,
+    required String modelName,
+    double threshold = 0.5,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final results = await ref
+          .read(predictionRepositoryProvider)
+          .predictBatch(
+            texts: texts,
+            modelName: modelName,
+            threshold: threshold,
+          );
+      // Zip inputs to outputs positionally; tolerate a short/long response.
+      return [
+        for (var i = 0; i < results.length && i < texts.length; i++)
+          BatchItemResult(text: texts[i], result: results[i]),
+      ];
+    });
+  }
+
+  void reset() => state = const AsyncData(null);
+}
+
+final batchPredictionProvider =
+    AsyncNotifierProvider.autoDispose<
+      BatchPredictionNotifier,
+      List<BatchItemResult>?
+    >(BatchPredictionNotifier.new);

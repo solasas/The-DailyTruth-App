@@ -2,47 +2,89 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/articles/presentation/screens/article_submit_screen.dart';
+import '../../features/articles/presentation/screens/article_verdict_screen.dart';
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/profile_screen.dart';
 import '../../features/benchmark/presentation/screens/leaderboard_screen.dart';
 import '../../features/charts/presentation/screens/chart_fullscreen_screen.dart';
 import '../../features/charts/presentation/screens/charts_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/models/presentation/screens/model_registry_screen.dart';
 import '../../features/models/presentation/screens/models_screen.dart';
 import '../../features/prediction/presentation/screens/all_models_result_screen.dart';
 import '../../features/prediction/presentation/screens/analyze_screen.dart';
+import '../../features/prediction/presentation/screens/batch_result_screen.dart';
 import '../../features/prediction/presentation/screens/prediction_history_screen.dart';
 import '../../features/prediction/presentation/screens/single_prediction_result_screen.dart';
+import '../../features/review/presentation/screens/review_queue_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import 'app_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// App-wide navigation graph: a 5-tab [StatefulShellRoute] for the bottom
-/// nav, plus full-screen routes (results, history, chart viewer) pushed on
-/// the root navigator so they appear without the bottom bar.
+/// nav, plus full-screen routes (results, history, chart viewer, sign-in,
+/// agentic verification, review queue) pushed on the root navigator so they
+/// appear without the bottom bar.
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/home',
     routes: [
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) => AppShell(navigationShell: navigationShell),
+        builder: (context, state, navigationShell) =>
+            AppShell(navigationShell: navigationShell),
         branches: [
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/analyze', builder: (context, state) => const AnalyzeScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/models', builder: (context, state) => const ModelsScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/leaderboard', builder: (context, state) => const LeaderboardScreen()),
-          ]),
-          StatefulShellBranch(routes: [
-            GoRoute(path: '/settings', builder: (context, state) => const SettingsScreen()),
-          ]),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/analyze',
+                builder: (context, state) => const AnalyzeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/models',
+                builder: (context, state) => const ModelsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
         ],
+      ),
+      GoRoute(
+        path: '/leaderboard',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const LeaderboardScreen(),
+      ),
+      GoRoute(
+        path: '/settings',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/login',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) =>
+            LoginScreen(redirectTo: state.uri.queryParameters['redirect']),
       ),
       GoRoute(
         path: '/analyze/result',
@@ -55,9 +97,37 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const AllModelsResultScreen(),
       ),
       GoRoute(
+        path: '/analyze/result-batch',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const BatchResultScreen(),
+      ),
+      GoRoute(
         path: '/history',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PredictionHistoryScreen(),
+      ),
+      GoRoute(
+        path: '/verify',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ArticleSubmitScreen(),
+        routes: [
+          GoRoute(
+            path: ':id',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) =>
+                ArticleVerdictScreen(articleId: state.pathParameters['id']!),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/review-queue',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ReviewQueueScreen(),
+      ),
+      GoRoute(
+        path: '/models/registry',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const ModelRegistryScreen(),
       ),
       GoRoute(
         path: '/charts',

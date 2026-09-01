@@ -6,7 +6,9 @@ import '../../data/settings_local_datasource.dart';
 import '../../data/settings_repository_impl.dart';
 import '../../domain/repositories/settings_repository.dart';
 
-final settingsLocalDataSourceProvider = Provider<SettingsLocalDataSource>((ref) {
+final settingsLocalDataSourceProvider = Provider<SettingsLocalDataSource>((
+  ref,
+) {
   return SettingsLocalDataSourceImpl(ref.watch(sharedPreferencesProvider));
 });
 
@@ -33,7 +35,13 @@ final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
 
 class ApiBaseUrlNotifier extends Notifier<String> {
   @override
-  String build() => ref.watch(settingsRepositoryProvider).getApiBaseUrl();
+  String build() {
+    final baseUrl = ref.watch(settingsRepositoryProvider).getApiBaseUrl();
+    // Keep the live Dio client pointed at the persisted URL, not just the
+    // compile-time default — otherwise a custom URL is forgotten on restart.
+    ref.watch(dioClientProvider).updateBaseUrl(baseUrl);
+    return baseUrl;
+  }
 
   Future<void> setApiBaseUrl(String baseUrl) async {
     state = baseUrl;

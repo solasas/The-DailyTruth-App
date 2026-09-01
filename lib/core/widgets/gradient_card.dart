@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 /// Rounded card with a soft gradient background and drop shadow — the base
 /// visual building block for hero/summary cards across the app (server
 /// health, best model, consensus result, etc).
@@ -9,7 +11,7 @@ class GradientCard extends StatelessWidget {
     required this.child,
     this.colors,
     this.padding = const EdgeInsets.all(20),
-    this.borderRadius = 24,
+    this.borderRadius = 28,
     this.onTap,
   });
 
@@ -22,7 +24,11 @@ class GradientCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gradientColors =
-        colors ?? [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.primary];
+        colors ??
+        [
+          Theme.of(context).colorScheme.primary,
+          Theme.of(context).colorScheme.primary,
+        ];
 
     return Material(
       color: Colors.transparent,
@@ -41,8 +47,8 @@ class GradientCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: gradientColors.first.withValues(alpha: 0.35),
-                blurRadius: 24,
+                color: gradientColors.first.withValues(alpha: 0.28),
+                blurRadius: 32,
                 offset: const Offset(0, 12),
               ),
             ],
@@ -62,7 +68,7 @@ class SoftCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.onTap,
-    this.borderRadius = 20,
+    this.borderRadius = 24,
   });
 
   final Widget child;
@@ -88,9 +94,9 @@ class SoftCard extends StatelessWidget {
             border: Border.all(color: theme.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.05),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
+                color: AppColors.shadow(isDark ? 0.45 : 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
             ],
           ),

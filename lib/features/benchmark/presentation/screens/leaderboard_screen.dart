@@ -60,7 +60,10 @@ class LeaderboardScreen extends ConsumerWidget {
                   ),
                 FadeSlideIn(child: BestModelCard(result: best)),
                 const SizedBox(height: 24),
-                Text('Full Leaderboard', style: Theme.of(context).textTheme.titleLarge),
+                Text(
+                  'Full Leaderboard',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
                 const SizedBox(height: 12),
                 FadeSlideIn(
                   delay: const Duration(milliseconds: 100),
@@ -98,7 +101,11 @@ class _FallbackNotice extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded, color: AppColors.warning, size: 20),
+          const Icon(
+            Icons.info_outline_rounded,
+            color: AppColors.warning,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(

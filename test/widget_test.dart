@@ -22,7 +22,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
-        child: const ThePaperTrailApp(),
+        child: const TheDailyTruthApp(),
       ),
     );
     // Advance past the dashboard cards' staggered FadeSlideIn entrance
@@ -33,9 +33,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Analyze'), findsOneWidget);
+    expect(find.text('Check'), findsOneWidget);
     expect(find.text('Models'), findsOneWidget);
-    expect(find.text('Leaderboard'), findsOneWidget);
-    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Profile'), findsOneWidget);
   });
 }

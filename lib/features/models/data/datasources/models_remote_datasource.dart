@@ -2,10 +2,14 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/network/dio_client.dart';
+import '../../domain/entities/model_registry_entry.dart';
 import '../models/model_info_dto.dart';
+import '../models/model_registry_dto.dart';
 
 abstract class ModelsRemoteDataSource {
   Future<List<ModelInfoDto>> getModels();
+
+  Future<ModelRegistry> getRegistry();
 }
 
 class ModelsRemoteDataSourceImpl implements ModelsRemoteDataSource {
@@ -18,6 +22,14 @@ class ModelsRemoteDataSourceImpl implements ModelsRemoteDataSource {
     return _client.guard(() async {
       final response = await _client.dio.get(ApiEndpoints.models);
       return _parseModelList(response.data);
+    });
+  }
+
+  @override
+  Future<ModelRegistry> getRegistry() {
+    return _client.guard(() async {
+      final response = await _client.dio.get(ApiEndpoints.modelsRegistry);
+      return ModelRegistryDto.parse(response.data);
     });
   }
 

@@ -43,7 +43,7 @@ class ShimmerCardSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height,
+      constraints: BoxConstraints(minHeight: height),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
@@ -52,7 +52,8 @@ class ShimmerCardSkeleton extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.min,
+        spacing: 10,
         children: [
           Row(
             children: [
@@ -62,7 +63,10 @@ class ShimmerCardSkeleton extends StatelessWidget {
             ],
           ),
           const ShimmerBox(width: double.infinity, height: 12),
-          ShimmerBox(width: MediaQuery.of(context).size.width * 0.4, height: 12),
+          ShimmerBox(
+            width: MediaQuery.of(context).size.width * 0.4,
+            height: 12,
+          ),
         ],
       ),
     );

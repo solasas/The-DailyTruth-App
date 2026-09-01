@@ -12,14 +12,25 @@ class PredictionRepositoryImpl implements PredictionRepository {
   Future<PredictionResult> predict({
     required String text,
     required String modelName,
+    double threshold = 0.5,
   }) async {
-    final dto = await _remoteDataSource.predict(text: text, modelName: modelName);
+    final dto = await _remoteDataSource.predict(
+      text: text,
+      modelName: modelName,
+      threshold: threshold,
+    );
     return dto.toEntity();
   }
 
   @override
-  Future<AllModelsPrediction> predictAll({required String text}) async {
-    final dto = await _remoteDataSource.predictAll(text: text);
+  Future<AllModelsPrediction> predictAll({
+    required String text,
+    double threshold = 0.5,
+  }) async {
+    final dto = await _remoteDataSource.predictAll(
+      text: text,
+      threshold: threshold,
+    );
     return dto.toEntity();
   }
 
@@ -27,8 +38,13 @@ class PredictionRepositoryImpl implements PredictionRepository {
   Future<List<PredictionResult>> predictBatch({
     required List<String> texts,
     required String modelName,
+    double threshold = 0.5,
   }) async {
-    final dtos = await _remoteDataSource.predictBatch(texts: texts, modelName: modelName);
+    final dtos = await _remoteDataSource.predictBatch(
+      texts: texts,
+      modelName: modelName,
+      threshold: threshold,
+    );
     return dtos.map((d) => d.toEntity()).toList();
   }
 }

@@ -3,14 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/snackbar_utils.dart';
-import '../../../../core/widgets/loading_button.dart';
 import '../../../models/presentation/providers/models_providers.dart';
 import '../providers/prediction_providers.dart';
-import '../widgets/model_dropdown.dart';
 
-/// Lets the user paste/type an article and analyze it either with one
-/// selected model or with every loaded model at once.
+/// Compose a check: paste text, pick a mode (Single / Consensus / Batch),
+/// choose a model, tune the decision threshold, submit.
 class AnalyzeScreen extends ConsumerStatefulWidget {
   const AnalyzeScreen({super.key});
 
@@ -27,127 +26,265 @@ class _AnalyzeScreenState extends ConsumerState<AnalyzeScreen> {
     super.dispose();
   }
 
-  Future<void> _analyzeSingle() async {
-    final model = ref.read(selectedModelProvider);
-    if (model == null) {
-      SnackbarUtils.showInfo(context, 'Please select a model first.');
-      return;
-    }
-    final text = _controller.text.trim();
-    await ref.read(singlePredictionProvider.notifier).analyze(text: text, modelName: model);
+  List<String> get _batchItems => _controller.text
+      .split('\n')
+      .map((l) => l.trim())
+      .where((l) => l.isNotEmpty)
+      .toList();
 
-    if (!mounted) return;
-    final state = ref.read(singlePredictionProvider);
-    state.whenOrNull(
-      data: (result) {
-        if (result != null) context.push('/analyze/result');
-      },
-      error: (error, _) => SnackbarUtils.showError(context, error.toString()),
-    );
+  bool _isValid(CheckMode mode) {
+    if (mode == CheckMode.batch) {
+      final n = _batchItems.length;
+      return n >= AppConstants.minBatchItems && n <= AppConstants.maxBatchItems;
+    }
+    final len = _controller.text.trim().length;
+    return len >= AppConstants.minPredictTextLength &&
+        len <= AppConstants.maxPredictTextLength;
   }
 
-  Future<void> _analyzeAll() async {
-    final text = _controller.text.trim();
-    await ref.read(allModelsPredictionProvider.notifier).analyzeAll(text: text);
+  Future<void> _run() async {
+    final mode = ref.read(checkModeProvider);
+    final threshold = ref.read(thresholdProvider);
+    final model = ref.read(selectedModelProvider);
 
-    if (!mounted) return;
-    final state = ref.read(allModelsPredictionProvider);
-    state.whenOrNull(
-      data: (result) {
-        if (result != null) context.push('/analyze/result-all');
-      },
-      error: (error, _) => SnackbarUtils.showError(context, error.toString()),
-    );
+    if (mode.needsModel && model == null) {
+      SnackbarUtils.showInfo(context, 'Pick a model first.');
+      return;
+    }
+
+    switch (mode) {
+      case CheckMode.single:
+        await ref
+            .read(singlePredictionProvider.notifier)
+            .analyze(
+              text: _controller.text.trim(),
+              modelName: model!,
+              threshold: threshold,
+            );
+        if (!mounted) return;
+        ref
+            .read(singlePredictionProvider)
+            .whenOrNull(
+              data: (r) => r != null ? context.push('/analyze/result') : null,
+              error: (e, _) => SnackbarUtils.showError(context, e.toString()),
+            );
+      case CheckMode.consensus:
+        await ref
+            .read(allModelsPredictionProvider.notifier)
+            .analyzeAll(text: _controller.text.trim(), threshold: threshold);
+        if (!mounted) return;
+        ref
+            .read(allModelsPredictionProvider)
+            .whenOrNull(
+              data: (r) =>
+                  r != null ? context.push('/analyze/result-all') : null,
+              error: (e, _) => SnackbarUtils.showError(context, e.toString()),
+            );
+      case CheckMode.batch:
+        await ref
+            .read(batchPredictionProvider.notifier)
+            .run(texts: _batchItems, modelName: model!, threshold: threshold);
+        if (!mounted) return;
+        ref
+            .read(batchPredictionProvider)
+            .whenOrNull(
+              data: (r) =>
+                  r != null ? context.push('/analyze/result-batch') : null,
+              error: (e, _) => SnackbarUtils.showError(context, e.toString()),
+            );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final text = ref.watch(analyzeTextProvider);
-    final isValid = ref.watch(analyzeTextValidProvider);
-    final loadedModelsAsync = ref.watch(loadedModelsProvider);
-    final selectedModel = ref.watch(selectedModelProvider);
-    final singleLoading = ref.watch(singlePredictionProvider).isLoading;
-    final allLoading = ref.watch(allModelsPredictionProvider).isLoading;
-    final isBusy = singleLoading || allLoading;
     final theme = Theme.of(context);
+    final mode = ref.watch(checkModeProvider);
+    final threshold = ref.watch(thresholdProvider);
+    final selectedModel = ref.watch(selectedModelProvider);
+    final loadedModelsAsync = ref.watch(loadedModelsProvider);
+
+    final busy =
+        ref.watch(singlePredictionProvider).isLoading ||
+        ref.watch(allModelsPredictionProvider).isLoading ||
+        ref.watch(batchPredictionProvider).isLoading;
+
+    // Rebuild validity when text changes.
+    ref.watch(analyzeTextProvider);
+    final valid = _isValid(mode);
+    final count = mode == CheckMode.batch
+        ? '${_batchItems.length} / ${AppConstants.maxBatchItems} items'
+        : '${_controller.text.trim().length} / ${AppConstants.maxPredictTextLength}';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Analyze News')),
+      appBar: AppBar(title: const Text('Check an article')),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Paste an article or headline', style: theme.textTheme.titleMedium),
-              const SizedBox(height: 4),
-              Text(
-                'Minimum ${AppConstants.minAnalysisLength} characters required.',
-                style: theme.textTheme.bodySmall,
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: _controller,
-                maxLines: 10,
-                minLines: 6,
-                maxLength: AppConstants.maxAnalysisLength,
-                enabled: !isBusy,
-                onChanged: (value) => ref.read(analyzeTextProvider.notifier).state = value,
-                decoration: InputDecoration(
-                  hintText: 'e.g. "Scientists confirm the moon is actually...',
-                  alignLabelWithHint: true,
-                  counterText: '${text.trim().length}/${AppConstants.maxAnalysisLength}',
+        child: busy
+            ? const _RunningState()
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SegmentedButton<CheckMode>(
+                      showSelectedIcon: false,
+                      segments: [
+                        for (final m in CheckMode.values)
+                          ButtonSegment(value: m, label: Text(m.label)),
+                      ],
+                      selected: {mode},
+                      onSelectionChanged: (s) =>
+                          ref.read(checkModeProvider.notifier).state = s.first,
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _controller,
+                      minLines: 6,
+                      maxLines: 12,
+                      maxLength: mode == CheckMode.batch
+                          ? null
+                          : AppConstants.maxPredictTextLength,
+                      onChanged: (v) =>
+                          ref.read(analyzeTextProvider.notifier).state = v,
+                      decoration: InputDecoration(
+                        hintText: mode == CheckMode.batch
+                            ? 'One article or headline per line…'
+                            : 'Paste an article or headline…',
+                        alignLabelWithHint: true,
+                        counterText: '',
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(count, style: theme.textTheme.bodySmall),
+                    ),
+                    if (mode == CheckMode.batch)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          'One item per line · ${AppConstants.minBatchItems}–'
+                          '${AppConstants.maxBatchItems} items.',
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ),
+                    if (mode.needsModel) ...[
+                      const SizedBox(height: 20),
+                      Text('Model', style: theme.textTheme.titleSmall),
+                      const SizedBox(height: 8),
+                      loadedModelsAsync.when(
+                        loading: () => const LinearProgressIndicator(),
+                        error: (e, _) => Text(
+                          'Could not load models: $e',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.error,
+                          ),
+                        ),
+                        data: (models) {
+                          if (models.isEmpty) {
+                            return Text(
+                              'No models are loaded on the server.',
+                              style: theme.textTheme.bodySmall,
+                            );
+                          }
+                          return SizedBox(
+                            height: 44,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: models.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(width: 8),
+                              itemBuilder: (context, i) {
+                                final m = models[i];
+                                return Center(
+                                  child: ChoiceChip(
+                                    label: Text(m.displayName),
+                                    selected: selectedModel == m.name,
+                                    onSelected: (_) =>
+                                        ref
+                                            .read(
+                                              selectedModelProvider.notifier,
+                                            )
+                                            .state = m
+                                            .name,
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Threshold', style: theme.textTheme.titleSmall),
+                        Text(
+                          threshold.toStringAsFixed(2),
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: threshold,
+                      onChanged: (v) =>
+                          ref.read(thresholdProvider.notifier).state = v,
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: valid ? _run : null,
+                        child: const Text('Run check'),
+                      ),
+                    ),
+                    if (_controller.text.isNotEmpty && !valid)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          mode == CheckMode.batch
+                              ? 'Enter ${AppConstants.minBatchItems}–'
+                                    '${AppConstants.maxBatchItems} non-empty lines.'
+                              : 'Enter ${AppConstants.minPredictTextLength}–'
+                                    '${AppConstants.maxPredictTextLength} characters.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.error,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ),
-              if (text.isNotEmpty && !isValid)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    'Enter at least ${AppConstants.minAnalysisLength} characters.',
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
-                  ),
-                ),
-              const SizedBox(height: 20),
-              loadedModelsAsync.when(
-                loading: () => const LinearProgressIndicator(),
-                error: (error, _) => Text(
-                  'Could not load models: $error',
-                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.error),
-                ),
-                data: (models) {
-                  if (models.isEmpty) {
-                    return Text(
-                      'No models are currently loaded on the server.',
-                      style: theme.textTheme.bodySmall,
-                    );
-                  }
-                  return ModelDropdown(
-                    models: models,
-                    selectedModel: selectedModel,
-                    onChanged: isBusy
-                        ? null
-                        : (value) => ref.read(selectedModelProvider.notifier).state = value,
-                  );
-                },
-              ),
-              const SizedBox(height: 24),
-              LoadingButton(
-                label: 'Analyze using selected model',
-                icon: Icons.search_rounded,
-                isLoading: singleLoading,
-                onPressed: isValid && !isBusy && selectedModel != null ? _analyzeSingle : null,
-              ),
-              const SizedBox(height: 12),
-              LoadingButton(
-                label: 'Analyze using all models',
-                icon: Icons.hub_rounded,
-                outlined: true,
-                isLoading: allLoading,
-                onPressed: isValid && !isBusy ? _analyzeAll : null,
-              ),
-            ],
+      ),
+    );
+  }
+}
+
+class _RunningState extends StatelessWidget {
+  const _RunningState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 56,
+            height: 56,
+            child: CircularProgressIndicator(
+              strokeWidth: 4,
+              color: AppColors.primary,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+            ),
           ),
-        ),
+          const SizedBox(height: 16),
+          Text(
+            'Analyzing across models…',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
       ),
     );
   }

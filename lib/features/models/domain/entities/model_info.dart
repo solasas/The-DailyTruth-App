@@ -25,5 +25,6 @@ class ModelInfo with _$ModelInfo {
 
   /// Average of the five headline metrics, used as a simple sort key when a
   /// dedicated "overall score" isn't provided by the backend.
-  double get overallScore => (accuracy + f1Score + precision + recall + auc) / 5;
+  double get overallScore =>
+      (accuracy + f1Score + precision + recall + auc) / 5;
 }

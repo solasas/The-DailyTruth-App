@@ -7,7 +7,11 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: StatusBadge(label: 'Loaded', color: Colors.green, icon: Icons.check_circle),
+          body: StatusBadge(
+            label: 'Loaded',
+            color: Colors.green,
+            icon: Icons.check_circle,
+          ),
         ),
       ),
     );

@@ -23,7 +23,8 @@ class PredictionHistoryScreen extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: TextField(
-              onChanged: (value) => ref.read(historySearchQueryProvider.notifier).state = value,
+              onChanged: (value) =>
+                  ref.read(historySearchQueryProvider.notifier).state = value,
               decoration: const InputDecoration(
                 hintText: 'Search history…',
                 prefixIcon: Icon(Icons.search_rounded),
@@ -32,7 +33,8 @@ class PredictionHistoryScreen extends ConsumerWidget {
           ),
           Expanded(
             child: historyAsync.when(
-              loading: () => const ShimmerListSkeleton(count: 6, itemHeight: 78),
+              loading: () =>
+                  const ShimmerListSkeleton(count: 6, itemHeight: 78),
               error: (error, _) => ErrorView(
                 error: error,
                 onRetry: () => ref.invalidate(predictionHistoryProvider),
@@ -53,7 +55,9 @@ class PredictionHistoryScreen extends ConsumerWidget {
                     return RecentPredictionTile(
                       entry: entry,
                       onDelete: () async {
-                        await ref.read(predictionHistoryRepositoryProvider).delete(entry.id);
+                        await ref
+                            .read(predictionHistoryRepositoryProvider)
+                            .delete(entry.id);
                         ref.invalidate(predictionHistoryProvider);
                       },
                     );

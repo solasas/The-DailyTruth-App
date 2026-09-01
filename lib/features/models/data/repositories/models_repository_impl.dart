@@ -1,4 +1,5 @@
 import '../../domain/entities/model_info.dart';
+import '../../domain/entities/model_registry_entry.dart';
 import '../../domain/repositories/models_repository.dart';
 import '../datasources/models_remote_datasource.dart';
 
@@ -12,4 +13,7 @@ class ModelsRepositoryImpl implements ModelsRepository {
     final dtos = await _remoteDataSource.getModels();
     return dtos.map((dto) => dto.toEntity()).toList();
   }
+
+  @override
+  Future<ModelRegistry> getRegistry() => _remoteDataSource.getRegistry();
 }

@@ -16,7 +16,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
   ThemeMode getThemeMode() => _localDataSource.getThemeMode();
 
   @override
-  Future<void> setThemeMode(ThemeMode mode) => _localDataSource.setThemeMode(mode);
+  Future<void> setThemeMode(ThemeMode mode) =>
+      _localDataSource.setThemeMode(mode);
 
   @override
   String getApiBaseUrl() => _localDataSource.getApiBaseUrl();

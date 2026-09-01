@@ -18,7 +18,12 @@ class SnackbarUtils {
     _show(context, message, AppColors.primary, Icons.info_rounded);
   }
 
-  static void _show(BuildContext context, String message, Color color, IconData icon) {
+  static void _show(
+    BuildContext context,
+    String message,
+    Color color,
+    IconData icon,
+  ) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(

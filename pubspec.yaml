@@ -1,5 +1,5 @@
 name: the_daily_truth
-description: "The Paper Trail — AI-powered fake news detection platform."
+description: "The Daily Truth — AI-powered fake news detection platform."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -59,3 +59,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: Figtree
+      fonts:
+        - asset: assets/fonts/Figtree.ttf
+    - family: Caprasimo
+      fonts:
+        - asset: assets/fonts/Caprasimo-Regular.ttf

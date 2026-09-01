@@ -7,13 +7,17 @@ import '../../domain/entities/prediction_result.dart';
 /// every screen (single result, all-models, history) renders verdicts
 /// identically.
 extension VerdictVisuals on PredictionLabel {
-  Color get color => this == PredictionLabel.fake ? AppColors.error : AppColors.success;
+  Color get color =>
+      this == PredictionLabel.fake ? AppColors.error : AppColors.success;
 
-  List<Color> get gradient =>
-      this == PredictionLabel.fake ? AppColors.errorGradient : AppColors.successGradient;
+  List<Color> get gradient => this == PredictionLabel.fake
+      ? AppColors.errorGradient
+      : AppColors.successGradient;
 
-  IconData get icon =>
-      this == PredictionLabel.fake ? Icons.gpp_bad_rounded : Icons.verified_rounded;
+  IconData get icon => this == PredictionLabel.fake
+      ? Icons.gpp_bad_rounded
+      : Icons.verified_rounded;
 
-  String get label => this == PredictionLabel.fake ? 'FAKE' : 'REAL';
+  String get label =>
+      this == PredictionLabel.fake ? 'Likely fake' : 'Likely real';
 }

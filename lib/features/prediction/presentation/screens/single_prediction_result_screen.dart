@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart' show Share;
 
 import '../../../../core/theme/app_colors.dart';
@@ -13,24 +14,49 @@ import '../../domain/entities/prediction_result.dart';
 import '../providers/prediction_providers.dart';
 import '../widgets/verdict_visuals.dart';
 
-/// Displays the result of a single-model prediction with an animated
-/// confidence ring, probability bars and copy/share actions.
-class SinglePredictionResultScreen extends ConsumerWidget {
+/// Single-model verdict: a 140px confidence ring, verdict badge, probability
+/// bars, and flag / new-check actions.
+class SinglePredictionResultScreen extends ConsumerStatefulWidget {
   const SinglePredictionResultScreen({super.key});
 
+  @override
+  ConsumerState<SinglePredictionResultScreen> createState() =>
+      _SinglePredictionResultScreenState();
+}
+
+class _SinglePredictionResultScreenState
+    extends ConsumerState<SinglePredictionResultScreen> {
+  bool _flagged = false;
+
   String _shareText(PredictionResult result) {
-    return 'The Paper Trail analysis\n'
+    return 'The Daily Truth analysis\n'
         'Verdict: ${result.label.label}\n'
         'Confidence: ${(result.confidence * 100).toStringAsFixed(1)}%\n'
         'Model: ${result.displayName} (${result.category})';
   }
 
+  void _newCheck() {
+    ref.read(singlePredictionProvider.notifier).reset();
+    context.go('/analyze');
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final state = ref.watch(singlePredictionProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Prediction Result')),
+      appBar: AppBar(
+        title: const Text('Result'),
+        actions: [
+          state.valueOrNull == null
+              ? const SizedBox.shrink()
+              : IconButton(
+                  icon: const Icon(Icons.share_rounded),
+                  onPressed: () => Share.share(_shareText(state.value!)),
+                ),
+        ],
+      ),
       body: state.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => ErrorView(error: error),
@@ -44,53 +70,49 @@ class SinglePredictionResultScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                Hero(
-                  tag: 'verdict-icon',
-                  child: Container(
-                    width: 96,
-                    height: 96,
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(result.label.icon, color: color, size: 52),
-                  ),
+                AnimatedConfidenceRing(
+                  value: result.confidence,
+                  color: color,
+                  size: 140,
+                  strokeWidth: 12,
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  result.label.label,
-                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                  ),
+                StatusBadge(
+                  label: result.label.label,
+                  color: color,
+                  icon: result.label.icon,
                 ),
-                const SizedBox(height: 4),
-                StatusBadge(label: result.category, color: AppColors.categoryColor(result.category)),
-                const SizedBox(height: 28),
-                AnimatedConfidenceRing(value: result.confidence, color: color),
-                const SizedBox(height: 28),
-                Column(
-                  children: [
-                    AnimatedProgressBar(
-                      label: 'Fake probability',
-                      value: result.fakeProbability,
-                      color: AppColors.error,
-                    ),
-                    const SizedBox(height: 14),
-                    AnimatedProgressBar(
-                      label: 'Real probability',
-                      value: result.realProbability,
-                      color: AppColors.success,
-                    ),
-                  ],
+                const SizedBox(height: 6),
+                StatusBadge(
+                  label: result.category,
+                  color: AppColors.categoryColor(result.category),
+                  dense: true,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
+                AnimatedProgressBar(
+                  label: 'Fake probability',
+                  value: result.fakeProbability,
+                  color: AppColors.error,
+                ),
+                const SizedBox(height: 14),
+                AnimatedProgressBar(
+                  label: 'Real probability',
+                  value: result.realProbability,
+                  color: AppColors.success,
+                ),
+                const SizedBox(height: 20),
                 Row(
                   children: [
-                    Icon(Icons.psychology_alt_rounded, size: 18, color: Theme.of(context).hintColor),
+                    Icon(
+                      Icons.psychology_alt_rounded,
+                      size: 18,
+                      color: theme.hintColor,
+                    ),
                     const SizedBox(width: 8),
-                    Text('Model: ${result.displayName}', style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      'Model: ${result.displayName}',
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ],
                 ),
                 const SizedBox(height: 28),
@@ -98,25 +120,44 @@ class SinglePredictionResultScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        icon: const Icon(Icons.copy_rounded),
-                        label: const Text('Copy'),
-                        onPressed: () async {
-                          await Clipboard.setData(ClipboardData(text: _shareText(result)));
-                          if (context.mounted) {
-                            SnackbarUtils.showSuccess(context, 'Result copied to clipboard');
-                          }
-                        },
+                        onPressed: _flagged
+                            ? null
+                            : () {
+                                setState(() => _flagged = true);
+                                SnackbarUtils.showInfo(
+                                  context,
+                                  'Flagged for analyst review',
+                                );
+                              },
+                        icon: Icon(
+                          _flagged
+                              ? Icons.check_rounded
+                              : Icons.outlined_flag_rounded,
+                        ),
+                        label: Text(_flagged ? 'Flagged' : 'Flag for review'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.share_rounded),
-                        label: const Text('Share'),
-                        onPressed: () => Share.share(_shareText(result)),
+                      child: FilledButton(
+                        onPressed: _newCheck,
+                        child: const Text('New check'),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  icon: const Icon(Icons.copy_rounded, size: 18),
+                  label: const Text('Copy summary'),
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: _shareText(result)),
+                    );
+                    if (context.mounted) {
+                      SnackbarUtils.showSuccess(context, 'Result copied');
+                    }
+                  },
                 ),
               ],
             ),

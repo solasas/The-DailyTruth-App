@@ -11,11 +11,16 @@ class QuickActionButtons extends StatelessWidget {
     required this.onAnalyze,
     required this.onCompareModels,
     required this.onBenchmark,
+    this.onVerifyArticle,
   });
 
   final VoidCallback onAnalyze;
   final VoidCallback onCompareModels;
   final VoidCallback onBenchmark;
+
+  /// Opens the agentic article-verification flow. Optional so Home degrades
+  /// gracefully if the feature is ever pulled.
+  final VoidCallback? onVerifyArticle;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +35,17 @@ class QuickActionButtons extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
+        if (onVerifyArticle != null) ...[
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onVerifyArticle,
+              icon: const Icon(Icons.hub_rounded),
+              label: const Text('Verify an article (agentic)'),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
         Row(
           children: [
             Expanded(
@@ -88,7 +104,9 @@ class _ActionTile extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
         ],
       ),

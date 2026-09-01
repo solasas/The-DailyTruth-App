@@ -4,13 +4,21 @@ import '../models/all_models_prediction_dto.dart';
 import '../models/prediction_result_dto.dart';
 
 abstract class PredictionRemoteDataSource {
-  Future<PredictionResultDto> predict({required String text, required String modelName});
+  Future<PredictionResultDto> predict({
+    required String text,
+    required String modelName,
+    double threshold,
+  });
 
-  Future<AllModelsPredictionDto> predictAll({required String text});
+  Future<AllModelsPredictionDto> predictAll({
+    required String text,
+    double threshold,
+  });
 
   Future<List<PredictionResultDto>> predictBatch({
     required List<String> texts,
     required String modelName,
+    double threshold,
   });
 }
 
@@ -23,11 +31,12 @@ class PredictionRemoteDataSourceImpl implements PredictionRemoteDataSource {
   Future<PredictionResultDto> predict({
     required String text,
     required String modelName,
+    double threshold = 0.5,
   }) {
     return _client.guard(() async {
       final response = await _client.dio.post(
         ApiEndpoints.predict,
-        data: {'text': text, 'model_name': modelName},
+        data: {'text': text, 'model_name': modelName, 'threshold': threshold},
       );
       // The backend wraps the verdict in an envelope: {"text_preview": ..., "result": {...}}.
       final data = response.data as Map<String, dynamic>;
@@ -37,13 +46,18 @@ class PredictionRemoteDataSourceImpl implements PredictionRemoteDataSource {
   }
 
   @override
-  Future<AllModelsPredictionDto> predictAll({required String text}) {
+  Future<AllModelsPredictionDto> predictAll({
+    required String text,
+    double threshold = 0.5,
+  }) {
     return _client.guard(() async {
       final response = await _client.dio.post(
         ApiEndpoints.predictAll,
-        data: {'text': text},
+        data: {'text': text, 'threshold': threshold},
       );
-      return AllModelsPredictionDto.fromJson(response.data as Map<String, dynamic>);
+      return AllModelsPredictionDto.fromJson(
+        response.data as Map<String, dynamic>,
+      );
     });
   }
 
@@ -51,16 +65,19 @@ class PredictionRemoteDataSourceImpl implements PredictionRemoteDataSource {
   Future<List<PredictionResultDto>> predictBatch({
     required List<String> texts,
     required String modelName,
+    double threshold = 0.5,
   }) {
     return _client.guard(() async {
       final response = await _client.dio.post(
         ApiEndpoints.predictBatch,
-        data: {'texts': texts, 'model_name': modelName},
+        data: {'texts': texts, 'model_name': modelName, 'threshold': threshold},
       );
       final data = response.data;
       final List<dynamic> rawList = data is List
           ? data
-          : (data is Map && data['results'] is List ? data['results'] as List : const []);
+          : (data is Map && data['results'] is List
+                ? data['results'] as List
+                : const []);
       return rawList
           .map((e) => PredictionResultDto.fromJson(e as Map<String, dynamic>))
           .toList();

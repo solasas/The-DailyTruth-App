@@ -16,7 +16,8 @@ abstract class PredictionHistoryLocalDataSource {
   Future<void> clear();
 }
 
-class PredictionHistoryLocalDataSourceImpl implements PredictionHistoryLocalDataSource {
+class PredictionHistoryLocalDataSourceImpl
+    implements PredictionHistoryLocalDataSource {
   PredictionHistoryLocalDataSourceImpl(this._box);
 
   final Box _box;

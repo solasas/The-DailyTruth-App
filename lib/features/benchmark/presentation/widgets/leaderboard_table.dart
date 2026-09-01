@@ -19,7 +19,8 @@ class LeaderboardTable extends StatelessWidget {
   final LeaderboardSortState sortState;
   final void Function(LeaderboardColumn column) onSort;
 
-  int _columnIndex(LeaderboardColumn column) => LeaderboardColumn.values.indexOf(column);
+  int _columnIndex(LeaderboardColumn column) =>
+      LeaderboardColumn.values.indexOf(column);
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,9 @@ class LeaderboardTable extends StatelessWidget {
       child: DataTable(
         sortColumnIndex: _columnIndex(sortState.column),
         sortAscending: sortState.ascending,
-        headingRowColor: WidgetStatePropertyAll(theme.colorScheme.primary.withValues(alpha: 0.06)),
+        headingRowColor: WidgetStatePropertyAll(
+          theme.colorScheme.primary.withValues(alpha: 0.06),
+        ),
         columns: [
           DataColumn(
             label: const Text('Rank'),
@@ -73,20 +76,29 @@ class LeaderboardTable extends StatelessWidget {
           final isTop = result.rank == 1;
           return DataRow(
             color: isTop
-                ? WidgetStatePropertyAll(AppColors.warning.withValues(alpha: 0.08))
+                ? WidgetStatePropertyAll(
+                    AppColors.warning.withValues(alpha: 0.08),
+                  )
                 : null,
             cells: [
               DataCell(
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (isTop) const Icon(Icons.emoji_events_rounded, size: 16, color: AppColors.warning),
+                    if (isTop)
+                      const Icon(
+                        Icons.emoji_events_rounded,
+                        size: 16,
+                        color: AppColors.warning,
+                      ),
                     if (isTop) const SizedBox(width: 4),
                     Text('#${result.rank}'),
                   ],
                 ),
               ),
-              DataCell(Text(result.displayName, overflow: TextOverflow.ellipsis)),
+              DataCell(
+                Text(result.displayName, overflow: TextOverflow.ellipsis),
+              ),
               DataCell(Text('${(result.accuracy * 100).toStringAsFixed(1)}%')),
               DataCell(Text('${(result.f1Score * 100).toStringAsFixed(1)}%')),
               DataCell(Text('${(result.precision * 100).toStringAsFixed(1)}%')),

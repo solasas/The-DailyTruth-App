@@ -27,19 +27,24 @@ class BenchmarkResultDto with _$BenchmarkResultDto {
 
   factory BenchmarkResultDto.fromJson(Map<String, dynamic> json) {
     final metrics = json['metrics'] as Map<String, dynamic>? ?? const {};
-    final modelName = json['name'] as String? ?? json['model_name'] as String? ?? '';
+    final modelName =
+        json['name'] as String? ?? json['model_name'] as String? ?? '';
 
     return BenchmarkResultDto(
       modelName: modelName,
       displayName: json['display_name'] as String? ?? modelName,
       category: json['category'] as String? ?? 'unknown',
       accuracy: _toDouble(metrics['accuracy'] ?? json['accuracy']),
-      f1Score: _toDouble(metrics['f1'] ?? metrics['f1_score'] ?? json['f1_score']),
+      f1Score: _toDouble(
+        metrics['f1'] ?? metrics['f1_score'] ?? json['f1_score'],
+      ),
       precision: _toDouble(metrics['precision'] ?? json['precision']),
       recall: _toDouble(metrics['recall'] ?? json['recall']),
       auc: _toDouble(metrics['auc'] ?? json['auc']),
       trainingTime: _toDouble(
-        json['training_time'] ?? json['training_time_seconds'] ?? json['train_time'],
+        json['training_time'] ??
+            json['training_time_seconds'] ??
+            json['train_time'],
       ),
     );
   }

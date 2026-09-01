@@ -4,69 +4,85 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/fade_slide_in.dart';
+import '../../../../core/widgets/gradient_card.dart';
 import '../../../../core/widgets/offline_banner.dart';
-import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
-import '../../../benchmark/presentation/providers/benchmark_providers.dart';
+import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/widgets/login_sheet.dart';
 import '../../../prediction/presentation/providers/prediction_providers.dart';
 import '../../../prediction/presentation/widgets/recent_prediction_tile.dart';
 import '../providers/home_providers.dart';
-import '../widgets/quick_action_buttons.dart';
-import '../widgets/quick_stats_row.dart';
-import '../widgets/server_health_card.dart';
+import '../../domain/entities/server_health.dart';
 
-/// The app's dashboard: server health, quick stats, quick actions and a
-/// preview of recent predictions.
+/// Landing screen: brand header, a hero call-to-action into the check flow,
+/// and a feed of the device's recent checks.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   Future<void> _onRefresh(WidgetRef ref) async {
     ref.invalidate(serverHealthProvider);
-    ref.invalidate(benchmarkResultsProvider);
     ref.invalidate(predictionHistoryProvider);
-    await Future.wait([
-      ref.read(serverHealthProvider.future),
-      ref.read(benchmarkResultsProvider.future),
-    ]);
+    try {
+      await ref.read(serverHealthProvider.future);
+    } catch (_) {
+      // Surfaced by the health dot; pull-to-refresh just needs to complete.
+    }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final healthAsync = ref.watch(serverHealthProvider);
-    final bestModelAsync = ref.watch(bestModelSummaryProvider);
+    final theme = Theme.of(context);
     final historyAsync = ref.watch(predictionHistoryProvider);
+    final healthAsync = ref.watch(serverHealthProvider);
+    final isAuthed = ref.watch(isAuthenticatedProvider);
 
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 64,
+        titleSpacing: 20,
         title: Row(
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: AppColors.primaryGradient),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.shield_moon_rounded, color: Colors.white, size: 20),
-            ),
+            _HealthDot(healthAsync: healthAsync),
             const SizedBox(width: 10),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(AppConstants.appName),
-                Text(
-                  AppConstants.appTagline,
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+            Expanded(
+              child: Text(
+                AppConstants.appName,
+                style: theme.textTheme.headlineSmall,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () =>
+                  isAuthed ? context.go('/profile') : LoginSheet.show(context),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.14),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: theme.dividerColor),
+                ),
+                child: Icon(
+                  isAuthed
+                      ? Icons.person_rounded
+                      : Icons.person_outline_rounded,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -75,73 +91,88 @@ class HomeScreen extends ConsumerWidget {
             child: RefreshIndicator(
               onRefresh: () => _onRefresh(ref),
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                 children: [
                   FadeSlideIn(
-                    child: healthAsync.when(
-                      loading: () => const ShimmerCardSkeleton(height: 92),
-                      error: (error, _) => ErrorView(
-                        error: error,
-                        compact: true,
-                        onRetry: () => ref.invalidate(serverHealthProvider),
+                    child: GradientCard(
+                      colors: AppColors.primaryGradient,
+                      onTap: () => context.go('/analyze'),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'CHECK ANY ARTICLE',
+                            style: AppTypography.eyebrow(
+                              theme.colorScheme.onPrimary.withValues(
+                                alpha: 0.85,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            'Check any article for fake news',
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              color: theme.colorScheme.onPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            'Paste text or a headline, get a verdict backed by multiple AI models.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onPrimary.withValues(
+                                alpha: 0.92,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: theme.colorScheme.onPrimary,
+                              foregroundColor: AppColors.primary,
+                            ),
+                            onPressed: () => context.go('/analyze'),
+                            child: const Text('Start a check  →'),
+                          ),
+                        ],
                       ),
-                      data: (health) => ServerHealthCard(health: health),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 60),
-                    child: bestModelAsync.when(
-                      loading: () => const ShimmerCardSkeleton(height: 92),
-                      error: (_, _) => const QuickStatsRow(),
-                      data: (best) => QuickStatsRow(
-                        bestModelName: best?.name,
-                        bestModelAccuracy: best?.accuracy,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 120),
-                    child: QuickActionButtons(
-                      onAnalyze: () => context.go('/analyze'),
-                      onCompareModels: () => context.go('/models'),
-                      onBenchmark: () => context.go('/leaderboard'),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 160),
-                    child: SectionHeader(
-                      title: 'Recent Predictions',
-                      action: TextButton(
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Recent checks', style: theme.textTheme.titleLarge),
+                      TextButton(
                         onPressed: () => context.push('/history'),
                         child: const Text('See all'),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  FadeSlideIn(
-                    delay: const Duration(milliseconds: 200),
-                    child: historyAsync.when(
-                      loading: () => const ShimmerListSkeleton(count: 3, itemHeight: 78),
-                      error: (error, _) => ErrorView(error: error, compact: true),
-                      data: (entries) {
-                        if (entries.isEmpty) {
-                          return const EmptyState(
-                            icon: Icons.history_rounded,
-                            title: 'No predictions yet',
-                            subtitle: 'Analyze an article to get started.',
-                          );
-                        }
-                        final preview = entries.take(5).toList();
-                        return Column(
-                          children: preview
-                              .map((entry) => RecentPredictionTile(entry: entry))
-                              .toList(),
+                  const SizedBox(height: 4),
+                  historyAsync.when(
+                    loading: () =>
+                        const ShimmerListSkeleton(count: 3, itemHeight: 86),
+                    error: (error, _) => ErrorView(error: error, compact: true),
+                    data: (entries) {
+                      if (entries.isEmpty) {
+                        return const EmptyState(
+                          icon: Icons.history_rounded,
+                          title: 'No checks yet',
+                          subtitle: 'Run a check to see it here.',
                         );
-                      },
-                    ),
+                      }
+                      final preview = entries.take(6).toList();
+                      return Column(
+                        children: [
+                          for (var i = 0; i < preview.length; i++)
+                            RecentPredictionTile(
+                              entry: preview[i],
+                              showDivider: i != preview.length - 1,
+                              onTap: () => context.push('/history'),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ],
               ),
@@ -149,6 +180,30 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _HealthDot extends StatelessWidget {
+  const _HealthDot({required this.healthAsync});
+
+  final AsyncValue<ServerHealth> healthAsync;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = healthAsync.maybeWhen(
+      data: (h) => switch (h.status) {
+        ServerHealthStatus.healthy => AppColors.success,
+        ServerHealthStatus.degraded => AppColors.warning,
+        ServerHealthStatus.unavailable => AppColors.error,
+        ServerHealthStatus.unknown => AppColors.neutral400,
+      },
+      orElse: () => AppColors.neutral400,
+    );
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

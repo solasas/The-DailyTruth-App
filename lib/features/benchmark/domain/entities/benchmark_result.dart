@@ -15,11 +15,14 @@ class BenchmarkResult with _$BenchmarkResult {
     required double precision,
     required double recall,
     required double auc,
+
     /// Null when unavailable (e.g. derived from the [isFallback] path,
     /// which has no training-time data).
     double? trainingTimeSeconds,
+
     /// 1-based rank, assigned client-side after sorting by accuracy.
     @Default(0) int rank,
+
     /// True when this row was derived client-side from `GET /models`
     /// because `GET /results` was unavailable — see
     /// `benchmarkOrFallbackProvider`.

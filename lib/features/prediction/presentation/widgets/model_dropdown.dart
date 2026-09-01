@@ -19,7 +19,9 @@ class ModelDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
-      initialValue: models.any((m) => m.name == selectedModel) ? selectedModel : null,
+      initialValue: models.any((m) => m.name == selectedModel)
+          ? selectedModel
+          : null,
       decoration: const InputDecoration(
         labelText: 'Model',
         prefixIcon: Icon(Icons.psychology_alt_rounded),

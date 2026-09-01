@@ -50,7 +50,8 @@ class AnimatedConfidenceRing extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    centerLabel ?? '${(animatedValue * 100).toStringAsFixed(1)}%',
+                    centerLabel ??
+                        '${(animatedValue * 100).toStringAsFixed(1)}%',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       color: color,
                       fontWeight: FontWeight.w700,

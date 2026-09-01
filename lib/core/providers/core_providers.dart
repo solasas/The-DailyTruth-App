@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../local/hive_boxes.dart';
 import '../network/dio_client.dart';
 import '../network/network_info.dart';
+import '../network/token_store.dart';
 
 /// Overridden in `main.dart` with the resolved instance obtained during
 /// startup, before `runApp`. Kept as an unimplemented default so any
@@ -26,8 +27,15 @@ final connectivityStatusProvider = StreamProvider<bool>((ref) {
   return ref.watch(networkInfoProvider).onConnectivityChanged;
 });
 
+/// Process-wide bearer-token holder. The auth feature hydrates this on
+/// startup and updates it on login/logout; [DioClient] reads it per request.
+final tokenStoreProvider = Provider<TokenStore>((ref) => TokenStore());
+
 final dioClientProvider = Provider<DioClient>((ref) {
-  return DioClient(networkInfo: ref.watch(networkInfoProvider));
+  return DioClient(
+    networkInfo: ref.watch(networkInfoProvider),
+    tokenStore: ref.watch(tokenStoreProvider),
+  );
 });
 
 final predictionHistoryBoxProvider = Provider<Box>((ref) {

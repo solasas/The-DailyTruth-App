@@ -30,8 +30,13 @@ class ChartThumbnail extends ConsumerWidget {
               child: Hero(
                 tag: 'chart-${chart.name}',
                 child: imageAsync.when(
-                  loading: () => const ShimmerBox(width: double.infinity, height: double.infinity, borderRadius: 0),
-                  error: (_, _) => const Center(child: Icon(Icons.broken_image_outlined)),
+                  loading: () => const ShimmerBox(
+                    width: double.infinity,
+                    height: double.infinity,
+                    borderRadius: 0,
+                  ),
+                  error: (_, _) =>
+                      const Center(child: Icon(Icons.broken_image_outlined)),
                   data: (bytes) => Image.memory(bytes, fit: BoxFit.cover),
                 ),
               ),
@@ -42,7 +47,9 @@ class ChartThumbnail extends ConsumerWidget {
                 chart.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
           ],

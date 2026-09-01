@@ -17,7 +17,9 @@ class ModelMetricChip extends StatelessWidget {
       children: [
         Text(
           '${(value * 100).toStringAsFixed(1)}%',
-          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
         ),
         Text(label, style: theme.textTheme.bodySmall),
       ],

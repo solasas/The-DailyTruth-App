@@ -34,7 +34,9 @@ class AllModelsPredictionDto with _$AllModelsPredictionDto {
 
   AllModelsPrediction toEntity() {
     return AllModelsPrediction(
-      consensusLabel: consensus == 'fake' ? PredictionLabel.fake : PredictionLabel.real,
+      consensusLabel: consensus == 'fake'
+          ? PredictionLabel.fake
+          : PredictionLabel.real,
       consensusConfidence: consensusConfidence,
       results: results.map((r) => r.toEntity()).toList(),
     );

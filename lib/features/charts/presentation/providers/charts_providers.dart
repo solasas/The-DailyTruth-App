@@ -16,19 +16,20 @@ final chartsRepositoryProvider = Provider<ChartsRepository>((ref) {
   return ChartsRepositoryImpl(ref.watch(chartsRemoteDataSourceProvider));
 });
 
-final chartsListProvider = FutureProvider.autoDispose<List<ChartInfo>>((ref) async {
+final chartsListProvider = FutureProvider.autoDispose<List<ChartInfo>>((
+  ref,
+) async {
   final repository = ref.watch(chartsRepositoryProvider);
   return repository.getCharts();
 });
 
 /// Lazily fetches and caches the raw bytes of one chart image, keyed by
 /// filename, so scrolling the gallery doesn't re-download visible thumbnails.
-final chartImageProvider = FutureProvider.autoDispose.family<Uint8List, String>((
-  ref,
-  name,
-) async {
-  final repository = ref.watch(chartsRepositoryProvider);
-  final link = ref.keepAlive();
-  ref.onDispose(link.close);
-  return repository.getChartImage(name);
-});
+final chartImageProvider = FutureProvider.autoDispose.family<Uint8List, String>(
+  (ref, name) async {
+    final repository = ref.watch(chartsRepositoryProvider);
+    final link = ref.keepAlive();
+    ref.onDispose(link.close);
+    return repository.getChartImage(name);
+  },
+);

@@ -15,7 +15,9 @@ final homeRepositoryProvider = Provider<HomeRepository>((ref) {
   return HomeRepositoryImpl(ref.watch(homeRemoteDataSourceProvider));
 });
 
-final serverHealthProvider = FutureProvider.autoDispose<ServerHealth>((ref) async {
+final serverHealthProvider = FutureProvider.autoDispose<ServerHealth>((
+  ref,
+) async {
   final repository = ref.watch(homeRepositoryProvider);
   return repository.getServerHealth();
 });
@@ -32,10 +34,16 @@ class BestModelSummary {
 /// `GET /results` and falls back to `GET /models` internally (see
 /// `benchmarkOrFallbackProvider`) — kept here only to decouple the Home
 /// widgets from the benchmark feature's entity type.
-final bestModelSummaryProvider = Provider.autoDispose<AsyncValue<BestModelSummary?>>((
-  ref,
-) {
-  return ref.watch(bestModelProvider).whenData(
-    (best) => best == null ? null : BestModelSummary(name: best.displayName, accuracy: best.accuracy),
-  );
-});
+final bestModelSummaryProvider =
+    Provider.autoDispose<AsyncValue<BestModelSummary?>>((ref) {
+      return ref
+          .watch(bestModelProvider)
+          .whenData(
+            (best) => best == null
+                ? null
+                : BestModelSummary(
+                    name: best.displayName,
+                    accuracy: best.accuracy,
+                  ),
+          );
+    });

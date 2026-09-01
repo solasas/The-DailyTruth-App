@@ -18,12 +18,11 @@ final benchmarkRepositoryProvider = Provider<BenchmarkRepository>((ref) {
   return BenchmarkRepositoryImpl(ref.watch(benchmarkRemoteDataSourceProvider));
 });
 
-final benchmarkResultsProvider = FutureProvider.autoDispose<List<BenchmarkResult>>((
-  ref,
-) async {
-  final repository = ref.watch(benchmarkRepositoryProvider);
-  return repository.getResults();
-});
+final benchmarkResultsProvider =
+    FutureProvider.autoDispose<List<BenchmarkResult>>((ref) async {
+      final repository = ref.watch(benchmarkRepositoryProvider);
+      return repository.getResults();
+    });
 
 /// Prefers real leaderboard data from `GET /results`, but falls back to a
 /// client-side ranking derived from `GET /models` (sorted by accuracy; no
@@ -32,26 +31,26 @@ final benchmarkResultsProvider = FutureProvider.autoDispose<List<BenchmarkResult
 /// doesn't leave Leaderboard/Home with nothing to show. Every row in a
 /// fallback result carries `isFallback: true` so the UI can be transparent
 /// about it instead of silently presenting derived data as authoritative.
-final benchmarkOrFallbackProvider = Provider.autoDispose<AsyncValue<List<BenchmarkResult>>>((
-  ref,
-) {
-  final resultsAsync = ref.watch(benchmarkResultsProvider);
+final benchmarkOrFallbackProvider =
+    Provider.autoDispose<AsyncValue<List<BenchmarkResult>>>((ref) {
+      final resultsAsync = ref.watch(benchmarkResultsProvider);
 
-  return resultsAsync.when(
-    data: (results) => AsyncData(results),
-    loading: () => const AsyncLoading(),
-    error: (error, stackTrace) {
-      final modelsAsync = ref.watch(modelsListProvider);
-      return modelsAsync.whenData((models) {
-        final loaded = models.where((m) => m.loaded).toList()
-          ..sort((a, b) => b.accuracy.compareTo(a.accuracy));
-        return [
-          for (var i = 0; i < loaded.length; i++) _fromModelInfo(loaded[i], rank: i + 1),
-        ];
-      });
-    },
-  );
-});
+      return resultsAsync.when(
+        data: (results) => AsyncData(results),
+        loading: () => const AsyncLoading(),
+        error: (error, stackTrace) {
+          final modelsAsync = ref.watch(modelsListProvider);
+          return modelsAsync.whenData((models) {
+            final loaded = models.where((m) => m.loaded).toList()
+              ..sort((a, b) => b.accuracy.compareTo(a.accuracy));
+            return [
+              for (var i = 0; i < loaded.length; i++)
+                _fromModelInfo(loaded[i], rank: i + 1),
+            ];
+          });
+        },
+      );
+    });
 
 BenchmarkResult _fromModelInfo(ModelInfo model, {required int rank}) {
   return BenchmarkResult(
@@ -74,12 +73,20 @@ BenchmarkResult _fromModelInfo(ModelInfo model, {required int rank}) {
 final bestModelProvider = Provider.autoDispose<AsyncValue<BenchmarkResult?>>((
   ref,
 ) {
-  return ref.watch(benchmarkOrFallbackProvider).whenData(
-    (results) => results.isEmpty ? null : results.first,
-  );
+  return ref
+      .watch(benchmarkOrFallbackProvider)
+      .whenData((results) => results.isEmpty ? null : results.first);
 });
 
-enum LeaderboardColumn { rank, accuracy, f1, precision, recall, auc, trainingTime }
+enum LeaderboardColumn {
+  rank,
+  accuracy,
+  f1,
+  precision,
+  recall,
+  auc,
+  trainingTime,
+}
 
 class LeaderboardSortState {
   const LeaderboardSortState({
@@ -110,28 +117,29 @@ final leaderboardSortProvider =
       LeaderboardSortNotifier.new,
     );
 
-final sortedLeaderboardProvider = Provider.autoDispose<AsyncValue<List<BenchmarkResult>>>((
-  ref,
-) {
-  final resultsAsync = ref.watch(benchmarkOrFallbackProvider);
-  final sort = ref.watch(leaderboardSortProvider);
+final sortedLeaderboardProvider =
+    Provider.autoDispose<AsyncValue<List<BenchmarkResult>>>((ref) {
+      final resultsAsync = ref.watch(benchmarkOrFallbackProvider);
+      final sort = ref.watch(leaderboardSortProvider);
 
-  return resultsAsync.whenData((results) {
-    final sorted = [...results];
-    int compare(BenchmarkResult a, BenchmarkResult b) {
-      return switch (sort.column) {
-        LeaderboardColumn.rank => a.rank.compareTo(b.rank),
-        LeaderboardColumn.accuracy => a.accuracy.compareTo(b.accuracy),
-        LeaderboardColumn.f1 => a.f1Score.compareTo(b.f1Score),
-        LeaderboardColumn.precision => a.precision.compareTo(b.precision),
-        LeaderboardColumn.recall => a.recall.compareTo(b.recall),
-        LeaderboardColumn.auc => a.auc.compareTo(b.auc),
-        LeaderboardColumn.trainingTime =>
-          (a.trainingTimeSeconds ?? -1).compareTo(b.trainingTimeSeconds ?? -1),
-      };
-    }
+      return resultsAsync.whenData((results) {
+        final sorted = [...results];
+        int compare(BenchmarkResult a, BenchmarkResult b) {
+          return switch (sort.column) {
+            LeaderboardColumn.rank => a.rank.compareTo(b.rank),
+            LeaderboardColumn.accuracy => a.accuracy.compareTo(b.accuracy),
+            LeaderboardColumn.f1 => a.f1Score.compareTo(b.f1Score),
+            LeaderboardColumn.precision => a.precision.compareTo(b.precision),
+            LeaderboardColumn.recall => a.recall.compareTo(b.recall),
+            LeaderboardColumn.auc => a.auc.compareTo(b.auc),
+            LeaderboardColumn.trainingTime =>
+              (a.trainingTimeSeconds ?? -1).compareTo(
+                b.trainingTimeSeconds ?? -1,
+              ),
+          };
+        }
 
-    sorted.sort(sort.ascending ? compare : (a, b) => compare(b, a));
-    return sorted;
-  });
-});
+        sorted.sort(sort.ascending ? compare : (a, b) => compare(b, a));
+        return sorted;
+      });
+    });

@@ -28,7 +28,9 @@ class PredictionResultDto with _$PredictionResultDto {
   factory PredictionResultDto.fromJson(Map<String, dynamic> json) {
     final modelName = json['model_name'] as String? ?? '';
     return PredictionResultDto(
-      label: (json['label'] as String?)?.toLowerCase() ?? _labelFromPrediction(json['prediction']),
+      label:
+          (json['label'] as String?)?.toLowerCase() ??
+          _labelFromPrediction(json['prediction']),
       confidence: _toDouble(json['confidence']),
       probFake: _toDouble(json['prob_fake'] ?? json['fake_probability']),
       probReal: _toDouble(json['prob_real'] ?? json['real_probability']),

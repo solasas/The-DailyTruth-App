@@ -14,7 +14,8 @@ class ExpandablePredictionCard extends StatefulWidget {
   final PredictionResult result;
 
   @override
-  State<ExpandablePredictionCard> createState() => _ExpandablePredictionCardState();
+  State<ExpandablePredictionCard> createState() =>
+      _ExpandablePredictionCardState();
 }
 
 class _ExpandablePredictionCardState extends State<ExpandablePredictionCard> {

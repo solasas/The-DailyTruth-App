@@ -28,7 +28,9 @@ class QuickStatsRow extends StatelessWidget {
             icon: Icons.trending_up_rounded,
             iconColor: AppColors.success,
             label: 'Accuracy',
-            value: bestModelAccuracy != null ? '${(bestModelAccuracy! * 100).toStringAsFixed(1)}%' : '—',
+            value: bestModelAccuracy != null
+                ? '${(bestModelAccuracy! * 100).toStringAsFixed(1)}%'
+                : '—',
           ),
         ),
       ],
@@ -68,7 +70,9 @@ class _StatTile extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             value,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
           Text(label, style: theme.textTheme.bodySmall),
