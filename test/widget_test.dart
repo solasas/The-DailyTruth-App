@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
@@ -32,9 +33,15 @@ void main() {
     // in flight.
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('Home'), findsOneWidget);
-    expect(find.text('Check'), findsOneWidget);
-    expect(find.text('Models'), findsOneWidget);
-    expect(find.text('Profile'), findsOneWidget);
+    Finder navLabel(String label) => find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text(label),
+    );
+
+    expect(navLabel('Home'), findsOneWidget);
+    expect(navLabel('Paper Trail'), findsOneWidget);
+    expect(navLabel('Check'), findsOneWidget);
+    expect(navLabel('Models'), findsOneWidget);
+    expect(navLabel('Profile'), findsOneWidget);
   });
 }

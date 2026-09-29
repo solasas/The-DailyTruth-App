@@ -46,7 +46,7 @@ class RecentPredictionTile extends StatelessWidget {
                     height: 60,
                     decoration: BoxDecoration(
                       color: label.color.withValues(alpha: 0.14),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(label.icon, color: label.color, size: 26),
                   ),
@@ -60,16 +60,19 @@ class RecentPredictionTile extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.w700,
+                            height: 1.35,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           '${entry.isAllModels ? "All models" : entry.primaryResult.displayName}'
-                          ' · ${(confidence * 100).toStringAsFixed(0)}%'
-                          ' · ${DateFormatter.relative(entry.timestamp)}',
+                                  ' · ${(confidence * 100).toStringAsFixed(0)}%'
+                                  ' · ${DateFormatter.relative(entry.timestamp)}'
+                              .toUpperCase(),
                           style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.6,
                             color: muted,
                           ),
                         ),

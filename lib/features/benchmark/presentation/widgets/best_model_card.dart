@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/gradient_card.dart';
+import '../../../../core/widgets/page_hero.dart';
 import '../../domain/entities/benchmark_result.dart';
 
 /// Hero card at the top of the Leaderboard screen highlighting the
@@ -13,41 +16,29 @@ class BestModelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GradientCard(
-      colors: AppColors.primaryGradient,
+    final theme = Theme.of(context);
+    return AccentCard(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.emoji_events_rounded,
-                color: Colors.white,
-                size: 28,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Best Model',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: Colors.white),
-              ),
-            ],
+          const PillBadge(
+            icon: Icons.emoji_events_outlined,
+            label: 'Best model',
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
-            result.displayName,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.w700,
-            ),
+            result.displayName.toUpperCase(),
+            style: theme.textTheme.headlineMedium,
           ),
           const SizedBox(height: 4),
           Text(
             result.category,
-            style: const TextStyle(color: Colors.white70, fontSize: 13),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.extension<AppSemanticColors>()?.textSecondary,
+            ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           Row(
             children: [
               _Stat(
@@ -77,20 +68,24 @@ class _Stat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
+          label.toUpperCase(),
+          style: AppTypography.eyebrow(
+            theme.extension<AppSemanticColors>()?.textSecondary ??
+                theme.colorScheme.onSurface,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 12),
+          value,
+          style: theme.textTheme.titleLarge?.copyWith(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w900,
+          ),
         ),
       ],
     );

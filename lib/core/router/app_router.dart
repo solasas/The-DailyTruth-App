@@ -24,9 +24,10 @@ import 'app_shell.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// App-wide navigation graph: a 5-tab [StatefulShellRoute] for the bottom
-/// nav, plus full-screen routes (results, history, chart viewer, sign-in,
-/// agentic verification, review queue) pushed on the root navigator so they
-/// appear without the bottom bar.
+/// nav (Home · Paper Trail · Check · Models · Profile), plus full-screen
+/// routes (results, history, chart viewer, sign-in, verification verdict,
+/// review queue) pushed on the root navigator so they appear without the
+/// bottom bar.
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -41,6 +42,24 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/home',
                 builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/verify',
+                builder: (context, state) => const ArticleSubmitScreen(),
+                routes: [
+                  // The verdict poller opens full-screen, above the tab bar.
+                  GoRoute(
+                    path: ':id',
+                    parentNavigatorKey: _rootNavigatorKey,
+                    builder: (context, state) => ArticleVerdictScreen(
+                      articleId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -105,19 +124,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/history',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const PredictionHistoryScreen(),
-      ),
-      GoRoute(
-        path: '/verify',
-        parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => const ArticleSubmitScreen(),
-        routes: [
-          GoRoute(
-            path: ':id',
-            parentNavigatorKey: _rootNavigatorKey,
-            builder: (context, state) =>
-                ArticleVerdictScreen(articleId: state.pathParameters['id']!),
-          ),
-        ],
       ),
       GoRoute(
         path: '/review-queue',

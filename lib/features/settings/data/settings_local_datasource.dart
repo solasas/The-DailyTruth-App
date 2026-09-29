@@ -24,8 +24,9 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
     final value = _prefs.getString(_themeModeKey);
     return switch (value) {
       'light' => ThemeMode.light,
-      'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
+      'system' => ThemeMode.system,
+      // Dark newsroom look is the brand default until the user picks.
+      _ => ThemeMode.dark,
     };
   }
 

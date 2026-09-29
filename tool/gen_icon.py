@@ -1,21 +1,28 @@
 #!/usr/bin/env python3
-"""Generate the app launcher icon (cream ground, three grey text bars, a
-rising trail of four dots) and write every platform size in place.
+"""Generate the app launcher icon — the "T." brand mark (cream serif T with a
+red full stop on an ink ground) — and write every platform size in place.
 
-Pure Pillow, no network / no extra Flutter deps. Re-run after tweaking the
-constants below:  python3 tool/gen_icon.py
+Pure Pillow, no network / no extra Flutter deps; the serif comes from the
+bundled Playfair Display Black. Re-run after tweaking the constants below:
+python3 tool/gen_icon.py
 """
 import os
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FONT = os.path.join(ROOT, "assets", "fonts", "PlayfairDisplay-Black.ttf")
 
-BG = (243, 238, 224, 255)        # cream
-BAR = (217, 209, 193, 255)       # warm grey
-GREEN = (28, 58, 36, 255)        # deep forest green
-AMBER = (224, 144, 14, 255)      # golden amber
+BG = (20, 19, 18, 255)           # ink  #141312
+INK = (243, 239, 232, 255)       # cream #F3EFE8
+DOT = (226, 70, 60, 255)         # logo red #E2463C
 
 SS = 4  # supersample factor
+
+# Glyph geometry, as fractions of the canvas. The mark is kept inside the
+# central ~60% so it survives Android adaptive-icon masks unchanged.
+CAP_HEIGHT = 0.40   # height of the "T"
+DOT_R = 0.052       # dot radius
+GAP = 0.015         # space between the T's right edge and the dot
 
 
 def draw_icon(size, *, bg=True, inset=0.0):
@@ -25,29 +32,26 @@ def draw_icon(size, *, bg=True, inset=0.0):
     img = Image.new("RGBA", (S, S), BG if bg else (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
 
-    scale = 1.0 - 2 * inset
-    off = inset * S
+    scale = (1.0 - 2 * inset) * S
 
-    def X(u):  # normalised 0..1 -> px, with inset applied
-        return off + u * S * scale
+    # Size the font so the T's ink box is CAP_HEIGHT tall.
+    probe = ImageFont.truetype(FONT, 1000)
+    l, t, r, b = probe.getbbox("T")
+    font = ImageFont.truetype(FONT, int(1000 * CAP_HEIGHT * scale / (b - t)))
+    l, t, r, b = font.getbbox("T")
+    t_w, t_h = r - l, b - t
 
-    def bar(u_left, u_right, u_top, u_bot):
-        x0, x1, y0, y1 = X(u_left), X(u_right), X(u_top), X(u_bot)
-        d.rounded_rectangle([x0, y0, x1, y1], radius=(y1 - y0) / 2, fill=BAR)
+    dot_d = 2 * DOT_R * scale
+    total_w = t_w + GAP * scale + dot_d
+    x0 = (S - total_w) / 2
+    y0 = (S - t_h) / 2 + 0.01 * scale  # optical centring: nudge down a hair
 
-    bar(0.250, 0.755, 0.238, 0.285)
-    bar(0.250, 0.755, 0.363, 0.410)
-    bar(0.250, 0.575, 0.488, 0.535)
+    d.text((x0 - l, y0 - t), "T", font=font, fill=INK)
 
-    def dot(cx, cy, r, color):
-        c = (X(cx), X(cy))
-        rr = r * S * scale
-        d.ellipse([c[0] - rr, c[1] - rr, c[0] + rr, c[1] + rr], fill=color)
-
-    dot(0.293, 0.700, 0.033, GREEN)
-    dot(0.417, 0.756, 0.048, GREEN)
-    dot(0.567, 0.723, 0.063, GREEN)
-    dot(0.723, 0.634, 0.082, AMBER)
+    cx = x0 + t_w + GAP * scale + dot_d / 2
+    cy = y0 + t_h - dot_d / 2
+    rr = dot_d / 2
+    d.ellipse([cx - rr, cy - rr, cx + rr, cy + rr], fill=DOT)
 
     return img.resize((size, size), Image.LANCZOS)
 
@@ -74,10 +78,13 @@ for d, legacy, adaptive in [
     ("xxhdpi", 144, 324), ("xxxhdpi", 192, 432),
 ]:
     save(draw_icon(legacy), *RES, f"mipmap-{d}", "ic_launcher.png")
-    # Adaptive foreground: full-bleed artwork on transparent; the cream
+    # Adaptive foreground: full-bleed artwork on transparent; the ink
     # `ic_launcher_background` shows through and the launcher applies its own
     # mask + safe-zone. The master art already carries generous margins.
     save(draw_icon(adaptive, bg=False, inset=0.0), *RES, f"mipmap-{d}", "ic_launcher_foreground.png")
+    # Splash mark (96dp): a plain PNG, since on API 26+ `@mipmap/ic_launcher`
+    # resolves to the adaptive-icon XML, which a splash <bitmap> can't load.
+    save(draw_icon(legacy * 2), *RES, f"mipmap-{d}", "launch_image.png")
 
 _anydpi = os.path.join(ROOT, *RES, "mipmap-anydpi-v26", "ic_launcher.xml")
 os.makedirs(os.path.dirname(_anydpi), exist_ok=True)
@@ -98,7 +105,7 @@ with open(_bg, "w") as f:
         '<?xml version="1.0" encoding="utf-8"?>\n'
         '<shape xmlns:android="http://schemas.android.com/apk/res/android" '
         'android:shape="rectangle">\n'
-        '    <solid android:color="#F3EEE0"/>\n'
+        '    <solid android:color="#141312"/>\n'
         '</shape>\n'
     )
 print("wrote", os.path.relpath(_bg, ROOT))

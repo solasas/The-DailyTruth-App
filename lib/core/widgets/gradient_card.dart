@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
 
-/// Rounded card with a soft gradient background and drop shadow — the base
+/// Rounded card with a gradient background and drop shadow — the base
 /// visual building block for hero/summary cards across the app (server
 /// health, best model, consensus result, etc).
 class GradientCard extends StatelessWidget {
@@ -11,7 +11,7 @@ class GradientCard extends StatelessWidget {
     required this.child,
     this.colors,
     this.padding = const EdgeInsets.all(20),
-    this.borderRadius = 28,
+    this.borderRadius = 12,
     this.onTap,
   });
 
@@ -47,9 +47,9 @@ class GradientCard extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: gradientColors.first.withValues(alpha: 0.28),
-                blurRadius: 32,
-                offset: const Offset(0, 12),
+                color: gradientColors.first.withValues(alpha: 0.25),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
@@ -60,7 +60,7 @@ class GradientCard extends StatelessWidget {
   }
 }
 
-/// Plain white/surface card with soft shadow, used for all secondary content
+/// Plain surface card with a hairline border, used for all secondary content
 /// (list rows, stat tiles, expandable panels).
 class SoftCard extends StatelessWidget {
   const SoftCard({
@@ -68,7 +68,7 @@ class SoftCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.onTap,
-    this.borderRadius = 24,
+    this.borderRadius = 12,
   });
 
   final Widget child;
@@ -94,14 +94,58 @@ class SoftCard extends StatelessWidget {
             border: Border.all(color: theme.dividerColor),
             boxShadow: [
               BoxShadow(
-                color: AppColors.shadow(isDark ? 0.45 : 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+                color: AppColors.shadow(isDark ? 0.35 : 0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
           child: child,
         ),
+      ),
+    );
+  }
+}
+
+/// Surface card topped by the brand's thin red→amber stripe — the frame the
+/// reference puts around every input panel ("Paste article content…").
+class AccentCard extends StatelessWidget {
+  const AccentCard({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+    this.borderColor,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+
+  /// Overrides the hairline border (e.g. red for error panels).
+  final Color? borderColor;
+
+  static const double _radius = 12;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(_radius),
+        border: Border.all(color: borderColor ?? theme.dividerColor),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            height: 3,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(colors: AppColors.accentStripe),
+            ),
+          ),
+          Padding(padding: padding, child: child),
+        ],
       ),
     );
   }

@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/auth/presentation/widgets/login_sheet.dart';
 
-/// Hosts the 4-tab bottom navigation (Home · Check · Models · Profile) around
+/// Hosts the 5-tab bottom navigation (Home · Paper Trail · Check · Models ·
+/// Profile — the reference site's top nav, adapted for mobile) around
 /// whichever [StatefulShellRoute] branch is active, preserving each tab's
 /// navigation stack and scroll position.
 ///
@@ -16,13 +17,18 @@ class AppShell extends ConsumerWidget {
 
   final StatefulNavigationShell navigationShell;
 
-  static const _profileIndex = 3;
+  static const _profileIndex = 4;
 
   static const _destinations = [
     NavigationDestination(
       icon: Icon(Icons.home_outlined),
       selectedIcon: Icon(Icons.home_rounded),
       label: 'Home',
+    ),
+    NavigationDestination(
+      icon: Icon(Icons.description_outlined),
+      selectedIcon: Icon(Icons.description_rounded),
+      label: 'Paper Trail',
     ),
     NavigationDestination(
       icon: Icon(Icons.fact_check_outlined),
@@ -45,18 +51,25 @@ class AppShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        destinations: _destinations,
-        onDestinationSelected: (index) {
-          if (index == _profileIndex && !ref.read(isAuthenticatedProvider)) {
-            LoginSheet.show(context);
-          }
-          navigationShell.goBranch(
-            index,
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
+      bottomNavigationBar: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Theme.of(context).dividerColor),
+          ),
+        ),
+        child: NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          destinations: _destinations,
+          onDestinationSelected: (index) {
+            if (index == _profileIndex && !ref.read(isAuthenticatedProvider)) {
+              LoginSheet.show(context);
+            }
+            navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            );
+          },
+        ),
       ),
     );
   }

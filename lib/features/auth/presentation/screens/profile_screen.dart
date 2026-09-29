@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/brand_app_bar.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../domain/entities/auth_session.dart';
 import '../providers/auth_providers.dart';
@@ -21,7 +22,7 @@ class ProfileScreen extends ConsumerWidget {
     final session = ref.watch(authControllerProvider).valueOrNull;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: const BrandAppBar(),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
