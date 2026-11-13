@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/empty_state.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/fade_slide_in.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import '../providers/benchmark_providers.dart';
 import '../widgets/best_model_card.dart';
@@ -60,10 +61,7 @@ class LeaderboardScreen extends ConsumerWidget {
                   ),
                 FadeSlideIn(child: BestModelCard(result: best)),
                 const SizedBox(height: 24),
-                Text(
-                  'Full Leaderboard',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                const SectionHeader(title: 'Full leaderboard'),
                 const SizedBox(height: 12),
                 FadeSlideIn(
                   delay: const Duration(milliseconds: 100),
@@ -96,7 +94,7 @@ class _FallbackNotice extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.warning.withValues(alpha: 0.3)),
       ),
       child: Row(

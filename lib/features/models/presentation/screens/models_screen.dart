@@ -3,31 +3,44 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/widgets/brand_app_bar.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../../core/widgets/gradient_card.dart';
+import '../../../../core/widgets/page_hero.dart';
+import '../../../../core/widgets/section_header.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
 import '../../../../core/widgets/status_badge.dart';
 import '../../../charts/presentation/providers/charts_providers.dart';
 import '../../domain/entities/model_info.dart';
 import '../providers/models_providers.dart';
 
-/// Browse the model catalog: a best-performer card, the full list, and the
-/// benchmark chart gallery.
+/// Browse the model catalog: the "Model Leaderboard" hero, a best-performer
+/// card, the ranked list, and the benchmark chart gallery.
 class ModelsScreen extends ConsumerWidget {
   const ModelsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final modelsAsync = ref.watch(modelsListProvider);
 
+    const hero = Padding(
+      padding: EdgeInsets.only(top: 12, bottom: 28),
+      child: PageHero(
+        badgeIcon: Icons.bar_chart_rounded,
+        badgeLabel: 'Benchmark rankings',
+        title: 'Model leaderboard',
+        subtitle: 'Performance rankings and metrics.',
+      ),
+    );
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Models'),
+      appBar: BrandAppBar(
         actions: [
-          IconButton(
+          CircleIconButton(
             tooltip: 'Model registry',
-            icon: const Icon(Icons.inventory_2_outlined),
+            icon: Icons.inventory_2_outlined,
             onPressed: () => context.push('/models/registry'),
           ),
         ],
@@ -35,10 +48,20 @@ class ModelsScreen extends ConsumerWidget {
       body: RefreshIndicator(
         onRefresh: () async => ref.refresh(modelsListProvider.future),
         child: modelsAsync.when(
-          loading: () => const ShimmerListSkeleton(count: 5, itemHeight: 64),
+          loading: () => ListView(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+            children: const [
+              hero,
+              ShimmerListSkeleton(count: 5, itemHeight: 64),
+            ],
+          ),
           error: (error, _) => ListView(
+            padding: const EdgeInsets.fromLTRB(0, 16, 0, 24),
             children: [
-              const SizedBox(height: 80),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: hero,
+              ),
               ErrorView(
                 error: error,
                 onRetry: () => ref.invalidate(modelsListProvider),
@@ -51,15 +74,35 @@ class ModelsScreen extends ConsumerWidget {
             final best = ranked.isEmpty ? null : ranked.first;
 
             return ListView(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
               children: [
+                hero,
                 if (best != null) _LeaderboardCard(best: best),
-                const SizedBox(height: 24),
-                Text('All models', style: theme.textTheme.titleLarge),
+                const SizedBox(height: 28),
+                SectionHeader(
+                  title: 'All models',
+                  action: TextButton(
+                    onPressed: () => context.push('/leaderboard'),
+                    child: const Text('Full table'),
+                  ),
+                ),
                 const SizedBox(height: 8),
-                for (final m in ranked) _ModelRow(model: m),
-                const SizedBox(height: 24),
-                Text('Benchmark charts', style: theme.textTheme.titleLarge),
+                SoftCard(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 6,
+                  ),
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < ranked.length; i++) ...[
+                        if (i > 0) const Divider(height: 1),
+                        _ModelRow(rank: i + 1, model: ranked[i]),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 28),
+                const SectionHeader(title: 'Benchmark charts'),
                 const SizedBox(height: 12),
                 const _ChartGallery(),
               ],
@@ -79,29 +122,21 @@ class _LeaderboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
+    return AccentCard(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.sage100,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.sage300),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'BEST PERFORMING MODEL',
-            style: AppTypography.eyebrow(AppColors.sage700),
+          const PillBadge(
+            icon: Icons.emoji_events_outlined,
+            label: 'Best performing model',
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
-            best.displayName,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: AppColors.sage800,
-            ),
+            best.displayName.toUpperCase(),
+            style: theme.textTheme.headlineMedium,
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Row(
             children: [
               _Metric(label: 'Accuracy', value: best.accuracy),
@@ -129,17 +164,18 @@ class _Metric extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: AppColors.sage700,
+            label.toUpperCase(),
+            style: AppTypography.eyebrow(
+              theme.extension<AppSemanticColors>()?.textSecondary ??
+                  theme.colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             '${(value * 100).toStringAsFixed(1)}%',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.sage800,
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: AppColors.primary,
             ),
           ),
         ],
@@ -149,8 +185,9 @@ class _Metric extends StatelessWidget {
 }
 
 class _ModelRow extends StatelessWidget {
-  const _ModelRow({required this.model});
+  const _ModelRow({required this.rank, required this.model});
 
+  final int rank;
   final ModelInfo model;
 
   @override
@@ -161,9 +198,19 @@ class _ModelRow extends StatelessWidget {
     return Opacity(
       opacity: model.loaded ? 1 : 0.45,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
+            SizedBox(
+              width: 26,
+              child: Text(
+                rank.toString().padLeft(2, '0'),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: rank == 1 ? AppColors.primary : theme.hintColor,
+                ),
+              ),
+            ),
             Container(
               width: 8,
               height: 8,
@@ -229,7 +276,7 @@ class _ChartGallery extends ConsumerWidget {
             itemBuilder: (context, i) {
               final chart = charts[i];
               return InkWell(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(12),
                 onTap: () =>
                     context.push('/charts/${chart.name}', extra: chart.title),
                 child: Container(
@@ -237,7 +284,7 @@ class _ChartGallery extends ConsumerWidget {
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: theme.cardTheme.color,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: theme.dividerColor),
                   ),
                   child: Column(

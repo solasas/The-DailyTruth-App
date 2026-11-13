@@ -29,7 +29,12 @@ class AppTheme {
         : AppColors.textSecondaryLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
 
-    final onAccent = isDark ? AppColors.ink : AppColors.backgroundLight;
+    // Red accent always carries white text, as in the reference's
+    // "VERIFY ARTICLE" buttons and active nav pills.
+    const onAccent = Colors.white;
+    final sunken = isDark
+        ? AppColors.surfaceSunkenDark
+        : AppColors.surfaceSunkenLight;
 
     final colorScheme = ColorScheme(
       brightness: brightness,
@@ -42,9 +47,7 @@ class AppTheme {
       onError: onAccent,
       surface: card,
       onSurface: textPrimary,
-      surfaceContainerHighest: isDark
-          ? AppColors.surfaceSunkenDark
-          : AppColors.surfaceSunkenLight,
+      surfaceContainerHighest: sunken,
     );
 
     return ThemeData(
@@ -70,54 +73,71 @@ class AppTheme {
         elevation: 0,
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(12),
           side: BorderSide(color: border, width: 1),
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: isDark
-            ? AppColors.surfaceSunkenDark
-            : AppColors.neutral100,
+        backgroundColor: card,
         selectedColor: AppColors.primary,
-        checkmarkColor: background,
-        labelStyle: TextStyle(color: textPrimary, fontSize: 12),
-        secondaryLabelStyle: TextStyle(color: background, fontSize: 12),
+        checkmarkColor: onAccent,
+        labelStyle: TextStyle(
+          fontFamily: AppTypography.bodyFamily,
+          color: textPrimary,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        secondaryLabelStyle: const TextStyle(
+          fontFamily: AppTypography.bodyFamily,
+          color: onAccent,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
         side: BorderSide(color: border),
         shape: const StadiumBorder(),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
-      // 20px rounding (matches the prototype's textarea) so tall multiline
-      // fields don't become giant capsules. Single-line fields still read as
-      // pill-ish at this radius.
+      // Sunken, lightly rounded fields — the reference's near-black textarea
+      // sitting inside a lighter card.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? AppColors.surfaceSunkenDark : AppColors.neutral100,
+        fillColor: sunken,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 18,
-          vertical: 14,
+          vertical: 16,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.6),
         ),
-        hintStyle: TextStyle(color: textSecondary),
+        hintStyle: TextStyle(
+          fontFamily: AppTypography.bodyFamily,
+          color: textSecondary,
+        ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: onAccent,
           elevation: 0,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.35),
+          disabledForegroundColor: onAccent.withValues(alpha: 0.7),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: const StadiumBorder(),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(
+            fontFamily: AppTypography.bodyFamily,
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            letterSpacing: 0.3,
+          ),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -125,9 +145,16 @@ class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: onAccent,
           elevation: 0,
+          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.35),
+          disabledForegroundColor: onAccent.withValues(alpha: 0.7),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: const StadiumBorder(),
-          textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(
+            fontFamily: AppTypography.bodyFamily,
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            letterSpacing: 0.3,
+          ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -135,16 +162,27 @@ class AppTheme {
           foregroundColor: AppColors.primary,
           side: const BorderSide(color: AppColors.primary, width: 1.4),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          shape: const StadiumBorder(),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          textStyle: const TextStyle(
+            fontFamily: AppTypography.bodyFamily,
+            fontWeight: FontWeight.w800,
+            fontSize: 15,
+          ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.accent700),
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          textStyle: const TextStyle(
+            fontFamily: AppTypography.bodyFamily,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
           shape: WidgetStatePropertyAll(
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           side: WidgetStatePropertyAll(BorderSide(color: border)),
           backgroundColor: WidgetStateProperty.resolveWith((states) {
@@ -168,52 +206,71 @@ class AppTheme {
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: card,
-        selectedItemColor: AppColors.accent700,
+        selectedItemColor: AppColors.primary,
         unselectedItemColor: textSecondary,
         type: BottomNavigationBarType.fixed,
         elevation: 0,
         showUnselectedLabels: true,
       ),
+      // Bottom bar mirrors the reference's top nav: plain labels, with the
+      // active destination sitting on a solid red pill.
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: card,
-        indicatorColor: Colors.transparent,
+        backgroundColor: isDark ? const Color(0xFF111111) : card,
+        indicatorColor: AppColors.primary,
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(6),
+        ),
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
-        height: 64,
+        height: 68,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return TextStyle(
+            fontFamily: AppTypography.bodyFamily,
             fontSize: 12,
-            fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-            color: selected ? AppColors.accent700 : textSecondary,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? textPrimary : textSecondary,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
-          return IconThemeData(
-            color: selected ? AppColors.accent700 : textSecondary,
-          );
+          return IconThemeData(color: selected ? onAccent : textSecondary);
         }),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         backgroundColor: isDark ? AppColors.cardDark : AppColors.ink,
-        contentTextStyle: const TextStyle(color: AppColors.backgroundLight),
+        contentTextStyle: const TextStyle(
+          fontFamily: AppTypography.bodyFamily,
+          color: AppColors.textPrimaryDark,
+        ),
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: background,
         modalBackgroundColor: background,
         elevation: 0,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
       ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) =>
+              states.contains(WidgetState.selected) ? onAccent : textSecondary,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? AppColors.primary
+              : sunken,
+        ),
       ),
       dividerTheme: DividerThemeData(color: border, thickness: 1),
       extensions: [

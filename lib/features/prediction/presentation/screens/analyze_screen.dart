@@ -4,12 +4,18 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/brand_app_bar.dart';
+import '../../../../core/widgets/gradient_card.dart';
+import '../../../../core/widgets/page_hero.dart';
+import '../../../../core/widgets/pill_tabs.dart';
 import '../../../models/presentation/providers/models_providers.dart';
 import '../providers/prediction_providers.dart';
 
-/// Compose a check: paste text, pick a mode (Single / Consensus / Batch),
-/// choose a model, tune the decision threshold, submit.
+/// Compose a check: pick a mode (Single / Consensus / Batch) from the tab
+/// strip, paste text, choose a model, tune the decision threshold, submit.
 class AnalyzeScreen extends ConsumerStatefulWidget {
   const AnalyzeScreen({super.key});
 
@@ -98,6 +104,9 @@ class _AnalyzeScreenState extends ConsumerState<AnalyzeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final secondary =
+        theme.extension<AppSemanticColors>()?.textSecondary ??
+        theme.colorScheme.onSurface;
     final mode = ref.watch(checkModeProvider);
     final threshold = ref.watch(thresholdProvider);
     final selectedModel = ref.watch(selectedModelProvider);
@@ -116,149 +125,230 @@ class _AnalyzeScreenState extends ConsumerState<AnalyzeScreen> {
         : '${_controller.text.trim().length} / ${AppConstants.maxPredictTextLength}';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Check an article')),
+      appBar: const BrandAppBar(),
       body: SafeArea(
         child: busy
             ? const _RunningState()
             : SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SegmentedButton<CheckMode>(
-                      showSelectedIcon: false,
-                      segments: [
-                        for (final m in CheckMode.values)
-                          ButtonSegment(value: m, label: Text(m.label)),
-                      ],
-                      selected: {mode},
-                      onSelectionChanged: (s) =>
-                          ref.read(checkModeProvider.notifier).state = s.first,
+                    PillTabs<CheckMode>(
+                      values: CheckMode.values,
+                      selected: mode,
+                      labelOf: (m) => m.label,
+                      onSelected: (m) =>
+                          ref.read(checkModeProvider.notifier).state = m,
                     ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _controller,
-                      minLines: 6,
-                      maxLines: 12,
-                      maxLength: mode == CheckMode.batch
-                          ? null
-                          : AppConstants.maxPredictTextLength,
-                      onChanged: (v) =>
-                          ref.read(analyzeTextProvider.notifier).state = v,
-                      decoration: InputDecoration(
-                        hintText: mode == CheckMode.batch
-                            ? 'One article or headline per line…'
-                            : 'Paste an article or headline…',
-                        alignLabelWithHint: true,
-                        counterText: '',
-                      ),
+                    const SizedBox(height: 12),
+                    const Divider(height: 1),
+                    const SizedBox(height: 28),
+                    PageHero(
+                      badgeIcon: mode.badgeIcon,
+                      badgeLabel: mode.badge,
+                      title: mode.title,
+                      subtitle: mode.subtitle,
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(count, style: theme.textTheme.bodySmall),
-                    ),
-                    if (mode == CheckMode.batch)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          'One item per line · ${AppConstants.minBatchItems}–'
-                          '${AppConstants.maxBatchItems} items.',
-                          style: theme.textTheme.bodySmall,
-                        ),
-                      ),
-                    if (mode.needsModel) ...[
-                      const SizedBox(height: 20),
-                      Text('Model', style: theme.textTheme.titleSmall),
-                      const SizedBox(height: 8),
-                      loadedModelsAsync.when(
-                        loading: () => const LinearProgressIndicator(),
-                        error: (e, _) => Text(
-                          'Could not load models: $e',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.error,
+                    const SizedBox(height: 28),
+                    AccentCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextField(
+                            controller: _controller,
+                            minLines: 8,
+                            maxLines: 14,
+                            maxLength: mode == CheckMode.batch
+                                ? null
+                                : AppConstants.maxPredictTextLength,
+                            onChanged: (v) =>
+                                ref.read(analyzeTextProvider.notifier).state =
+                                    v,
+                            decoration: InputDecoration(
+                              hintText: mode == CheckMode.batch
+                                  ? 'Article 1\nArticle 2\nArticle 3'
+                                  : 'Paste article content…',
+                              alignLabelWithHint: true,
+                              counterText: '',
+                            ),
                           ),
-                        ),
-                        data: (models) {
-                          if (models.isEmpty) {
-                            return Text(
-                              'No models are loaded on the server.',
-                              style: theme.textTheme.bodySmall,
-                            );
-                          }
-                          return SizedBox(
-                            height: 44,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: models.length,
-                              separatorBuilder: (_, _) =>
-                                  const SizedBox(width: 8),
-                              itemBuilder: (context, i) {
-                                final m = models[i];
-                                return Center(
-                                  child: ChoiceChip(
-                                    label: Text(m.displayName),
-                                    selected: selectedModel == m.name,
-                                    onSelected: (_) =>
-                                        ref
-                                            .read(
-                                              selectedModelProvider.notifier,
-                                            )
-                                            .state = m
-                                            .name,
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  mode == CheckMode.batch
+                                      ? 'One item per line · '
+                                            '${AppConstants.minBatchItems}–'
+                                            '${AppConstants.maxBatchItems} items'
+                                      : '',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: secondary,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                count,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: secondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (mode.needsModel) ...[
+                            const SizedBox(height: 18),
+                            Text(
+                              'MODEL',
+                              style: AppTypography.eyebrow(secondary),
+                            ),
+                            const SizedBox(height: 8),
+                            loadedModelsAsync.when(
+                              loading: () => const LinearProgressIndicator(),
+                              error: (e, _) => Text(
+                                'Could not load models: $e',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                              data: (models) {
+                                if (models.isEmpty) {
+                                  return Text(
+                                    'No models are loaded on the server.',
+                                    style: theme.textTheme.bodySmall,
+                                  );
+                                }
+                                return SizedBox(
+                                  height: 44,
+                                  child: ListView.separated(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: models.length,
+                                    separatorBuilder: (_, _) =>
+                                        const SizedBox(width: 8),
+                                    itemBuilder: (context, i) {
+                                      final m = models[i];
+                                      return Center(
+                                        child: ChoiceChip(
+                                          label: Text(m.displayName),
+                                          showCheckmark: false,
+                                          selected: selectedModel == m.name,
+                                          onSelected: (_) =>
+                                              ref
+                                                      .read(
+                                                        selectedModelProvider
+                                                            .notifier,
+                                                      )
+                                                      .state =
+                                                  m.name,
+                                        ),
+                                      );
+                                    },
                                   ),
                                 );
                               },
                             ),
-                          );
-                        },
-                      ),
-                    ],
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Threshold', style: theme.textTheme.titleSmall),
-                        Text(
-                          threshold.toStringAsFixed(2),
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            color: theme.colorScheme.primary,
+                          ],
+                          const SizedBox(height: 18),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'THRESHOLD',
+                                style: AppTypography.eyebrow(secondary),
+                              ),
+                              Text(
+                                threshold.toStringAsFixed(2),
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: threshold,
-                      onChanged: (v) =>
-                          ref.read(thresholdProvider.notifier).state = v,
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        onPressed: valid ? _run : null,
-                        child: const Text('Run check'),
-                      ),
-                    ),
-                    if (_controller.text.isNotEmpty && !valid)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          mode == CheckMode.batch
-                              ? 'Enter ${AppConstants.minBatchItems}–'
-                                    '${AppConstants.maxBatchItems} non-empty lines.'
-                              : 'Enter ${AppConstants.minPredictTextLength}–'
-                                    '${AppConstants.maxPredictTextLength} characters.',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.error,
+                          Slider(
+                            value: threshold,
+                            onChanged: (v) =>
+                                ref.read(thresholdProvider.notifier).state = v,
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          // Red glow under the enabled button, as in the
+                          // reference's "VERIFY ARTICLE" bar.
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(6),
+                              boxShadow: valid
+                                  ? [
+                                      BoxShadow(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.35,
+                                        ),
+                                        blurRadius: 18,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: FilledButton(
+                              onPressed: valid ? _run : null,
+                              child: Text(mode.action.toUpperCase()),
+                            ),
+                          ),
+                          if (_controller.text.isNotEmpty && !valid)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: Text(
+                                mode == CheckMode.batch
+                                    ? 'Enter ${AppConstants.minBatchItems}–'
+                                          '${AppConstants.maxBatchItems} non-empty lines.'
+                                    : 'Enter ${AppConstants.minPredictTextLength}–'
+                                          '${AppConstants.maxPredictTextLength} characters.',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
+                    ),
                   ],
                 ),
               ),
       ),
     );
   }
+}
+
+/// Reference copy for each mode's hero and submit button.
+extension _CheckModeCopy on CheckMode {
+  IconData get badgeIcon => switch (this) {
+    CheckMode.single => Icons.verified_outlined,
+    CheckMode.consensus => Icons.hub_outlined,
+    CheckMode.batch => Icons.view_list_rounded,
+  };
+
+  String get badge => switch (this) {
+    CheckMode.single => 'Model-based check',
+    CheckMode.consensus => 'Multi-model panel',
+    CheckMode.batch => 'Bulk processing',
+  };
+
+  String get title => switch (this) {
+    CheckMode.single => 'Single article verification',
+    CheckMode.consensus => 'Editorial consensus',
+    CheckMode.batch => 'Batch analysis',
+  };
+
+  String get subtitle => switch (this) {
+    CheckMode.single => 'Submit an article for newsroom analysis.',
+    CheckMode.consensus => 'Compare multiple model opinions.',
+    CheckMode.batch => 'One article per line.',
+  };
+
+  String get action => switch (this) {
+    CheckMode.single => 'Verify article',
+    CheckMode.consensus => 'Analyze consensus',
+    CheckMode.batch => 'Analyze batch',
+  };
 }
 
 class _RunningState extends StatelessWidget {

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/snackbar_utils.dart';
+import '../../../../core/widgets/brand_logo.dart';
 import '../../../../core/widgets/loading_button.dart';
 import '../providers/auth_providers.dart';
 
@@ -76,6 +77,11 @@ class _LoginFormBodyState extends ConsumerState<LoginFormBody> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: BrandMark(size: 44),
+          ),
+          const SizedBox(height: 16),
           Text('Sign in', style: theme.textTheme.headlineSmall),
           const SizedBox(height: 4),
           Text(

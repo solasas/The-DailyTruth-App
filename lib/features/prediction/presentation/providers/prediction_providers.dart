@@ -84,18 +84,18 @@ enum CheckMode { single, consensus, batch }
 
 extension CheckModeX on CheckMode {
   String get label => switch (this) {
-    CheckMode.single => 'Single',
+    CheckMode.single => 'Single Check',
     CheckMode.consensus => 'Consensus',
-    CheckMode.batch => 'Batch',
+    CheckMode.batch => 'Batch Analysis',
   };
 
   /// Whether this mode needs a model picked (Consensus runs every model).
   bool get needsModel => this != CheckMode.consensus;
 }
 
-final checkModeProvider = StateProvider.autoDispose<CheckMode>(
-  (ref) => CheckMode.single,
-);
+/// Kept alive (not autoDispose) so Home's shortcuts can pre-select a mode
+/// before the Check tab has been built.
+final checkModeProvider = StateProvider<CheckMode>((ref) => CheckMode.single);
 
 /// Decision threshold (0.0–1.0, default 0.5) sent with every predict call.
 final thresholdProvider = StateProvider.autoDispose<double>((ref) => 0.5);
