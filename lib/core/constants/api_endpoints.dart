@@ -25,6 +25,7 @@ class ApiEndpoints {
 
   // --- Agentic article verification ---
   static const String articlesSubmit = '/articles/submit';
+  static const String articlesSubmitImage = '/articles/submit-image';
 
   static String articleById(String id) => '/articles/$id';
 

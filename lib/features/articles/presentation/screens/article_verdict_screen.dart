@@ -13,6 +13,7 @@ import '../providers/articles_providers.dart';
 import '../widgets/article_verdict_visuals.dart';
 import '../widgets/claim_verdict_tile.dart';
 import '../widgets/degradation_banner.dart';
+import '../widgets/reasoning_trace_card.dart';
 import '../widgets/verification_progress.dart';
 
 /// Live view of one verification job: polls `GET /articles/{id}` and renders
@@ -27,7 +28,11 @@ class ArticleVerdictScreen extends ConsumerWidget {
     final buffer = StringBuffer('The Daily Truth — agentic verification\n');
     buffer.writeln('Verdict: ${v?.verdict.label ?? article.status.label}');
     if (v != null) {
-      buffer.writeln('Confidence: ${(v.confidence * 100).toStringAsFixed(1)}%');
+      buffer.writeln(
+        v.isAbstention
+            ? 'Not enough evidence to decide'
+            : 'Confidence: ${(v.confidence * 100).toStringAsFixed(0)}%',
+      );
       buffer.writeln(
         'Claims checked: ${v.claims.length} '
         '(${v.supportedClaims} supported, ${v.contradictedClaims} contradicted)',
@@ -154,8 +159,8 @@ class _VerdictView extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                '${(verdict.confidence * 100).toStringAsFixed(1)}% confidence · '
-                '${verdict.claims.length} claims checked',
+                '${verdict.isAbstention ? 'Not enough evidence to decide' : '${(verdict.confidence * 100).toStringAsFixed(0)}% confidence'} · '
+                '${verdict.claims.length} ${verdict.claims.length == 1 ? 'claim' : 'claims'} checked',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: Colors.white70,
                 ),
@@ -165,6 +170,13 @@ class _VerdictView extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         if (verdict.isDegraded) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Text(
+              'Limitations affecting this verdict',
+              style: theme.textTheme.labelMedium,
+            ),
+          ),
           for (final d in verdict.degradations)
             DegradationBanner(degradation: d),
           const SizedBox(height: 8),
@@ -219,6 +231,11 @@ class _VerdictView extends StatelessWidget {
         else
           for (var i = 0; i < verdict.claims.length; i++)
             ClaimVerdictTile(claim: verdict.claims[i], index: i),
+        if ((verdict.reasoningTrace ?? '').trim().isNotEmpty) ...[
+          const SizedBox(height: 4),
+          ReasoningTraceCard(trace: verdict.reasoningTrace!),
+          const SizedBox(height: 12),
+        ],
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: onCopy,

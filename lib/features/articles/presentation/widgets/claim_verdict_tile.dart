@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/gradient_card.dart';
 import '../../../../core/widgets/status_badge.dart';
 import '../../domain/entities/article.dart';
 import '../../domain/entities/article_enums.dart';
+import '../../domain/entities/origin.dart';
 import 'article_verdict_visuals.dart';
+import 'origin_trail_view.dart';
 
 /// One extracted claim with its NLI verdict, confidence and (expandable)
 /// supporting evidence.
@@ -18,7 +22,9 @@ class ClaimVerdictTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = ArticleVerdictVisuals.claimColor(claim.verdict);
-    final hasEvidence = (claim.evidence ?? '').trim().isNotEmpty;
+    final snippets = claim.evidenceSnippets.isNotEmpty
+        ? claim.evidenceSnippets
+        : [if ((claim.evidence ?? '').trim().isNotEmpty) claim.evidence!.trim()];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -72,35 +78,115 @@ class ClaimVerdictTile extends StatelessWidget {
                       ),
                   ],
                 ),
-                if (hasEvidence) ...[
+                if (claim.verdict == ClaimVerdict.unverifiable) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'That is not evidence against it — recent, regional and '
+                    'non-English topics are often missed.',
+                    style: theme.textTheme.bodySmall,
+                  ),
+                ],
+                if (snippets.isNotEmpty) ...[
                   const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text('Evidence', style: theme.textTheme.labelSmall),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    claim.evidence!.trim(),
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  for (var i = 0; i < snippets.length; i++)
+                    _EvidenceItem(
+                      snippet: snippets[i],
+                      domain: i < claim.sources.length ? claim.sources[i] : '',
+                      meta: i < claim.evidenceMeta.length
+                          ? claim.evidenceMeta[i]
+                          : null,
+                      fallbackUrl: i == 0 ? claim.sourceUrl : null,
+                    ),
                 ],
-                if ((claim.sourceUrl ?? '').trim().isNotEmpty) ...[
-                  const SizedBox(height: 8),
+                if (claim.origin != null) ...[
+                  const SizedBox(height: 12),
+                  const Divider(height: 1),
+                  const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      claim.sourceUrl!.trim(),
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
+                    child: OriginTrailView(origin: claim.origin!),
                   ),
                 ],
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _EvidenceItem extends StatelessWidget {
+  const _EvidenceItem({
+    required this.snippet,
+    required this.domain,
+    required this.meta,
+    required this.fallbackUrl,
+  });
+
+  final String snippet;
+  final String domain;
+  final EvidenceMeta? meta;
+  final String? fallbackUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final name = (meta?.domain ?? '').isNotEmpty ? meta!.domain : domain;
+    final url = (meta?.url ?? '').isNotEmpty ? meta!.url : (fallbackUrl ?? '');
+    final stance = meta?.stance ?? 'neutral';
+    final (stanceLabel, stanceColor) = switch (stance) {
+      'repeats' => ('repeats claim', AppColors.accent500),
+      'debunks' => ('contradicts claim', AppColors.sage500),
+      _ => ('neutral', AppColors.neutral600),
+    };
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(snippet.trim(), style: theme.textTheme.bodySmall),
+          const SizedBox(height: 4),
+          Wrap(
+            spacing: 6,
+            runSpacing: 4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              if (name.isNotEmpty)
+                InkWell(
+                  onTap: url.isEmpty
+                      ? null
+                      : () {
+                          final uri = Uri.tryParse(url);
+                          if (uri != null) {
+                            launchUrl(uri, mode: LaunchMode.externalApplication);
+                          }
+                        },
+                  child: Text(
+                    name,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: url.isEmpty ? null : theme.colorScheme.primary,
+                      decoration:
+                          url.isEmpty ? null : TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              if (meta != null)
+                StatusBadge(label: stanceLabel, color: stanceColor, dense: true),
+              if (meta != null)
+                Text(
+                  'trust ${meta!.trust.toStringAsFixed(2)}',
+                  style: theme.textTheme.labelSmall,
+                ),
+            ],
+          ),
+        ],
       ),
     );
   }

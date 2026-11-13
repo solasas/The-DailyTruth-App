@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'article_enums.dart';
+import 'origin.dart';
 
 part 'article.freezed.dart';
 
@@ -15,6 +16,14 @@ class ClaimVerdictResult with _$ClaimVerdictResult {
     @Default(0.0) double confidence,
     String? evidence,
     String? sourceUrl,
+
+    /// Evidence shown to NLI; `sources` and `evidenceMeta` run parallel to it.
+    @Default(<String>[]) List<String> evidenceSnippets,
+    @Default(<String>[]) List<String> sources,
+    @Default(<EvidenceMeta>[]) List<EvidenceMeta> evidenceMeta,
+
+    /// Present only for claims the evidence did not support.
+    Origin? origin,
   }) = _ClaimVerdictResult;
 }
 
@@ -35,6 +44,9 @@ class Verdict with _$Verdict {
     required ArticleVerdict verdict,
     @Default(0.0) double confidence,
     String? rationale,
+
+    /// Plain-text explanation, including each claim's `ORIGIN TRAIL`.
+    String? reasoningTrace,
     @Default(<ClaimVerdictResult>[]) List<ClaimVerdictResult> claims,
     @Default(<Degradation>[]) List<Degradation> degradations,
   }) = _Verdict;
@@ -48,6 +60,10 @@ class Verdict with _$Verdict {
       claims.where((c) => c.verdict == ClaimVerdict.contradiction).length;
 
   bool get isDegraded => degradations.isNotEmpty;
+
+  /// An honest abstention: `uncertain` with zero confidence.
+  bool get isAbstention =>
+      verdict == ArticleVerdict.uncertain && confidence == 0;
 }
 
 /// A submitted article and its verification state (`ArticleOut` on the wire).

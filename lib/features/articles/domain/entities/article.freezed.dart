@@ -24,6 +24,14 @@ mixin _$ClaimVerdictResult {
   String? get evidence => throw _privateConstructorUsedError;
   String? get sourceUrl => throw _privateConstructorUsedError;
 
+  /// Evidence shown to NLI; `sources` and `evidenceMeta` run parallel to it.
+  List<String> get evidenceSnippets => throw _privateConstructorUsedError;
+  List<String> get sources => throw _privateConstructorUsedError;
+  List<EvidenceMeta> get evidenceMeta => throw _privateConstructorUsedError;
+
+  /// Present only for claims the evidence did not support.
+  Origin? get origin => throw _privateConstructorUsedError;
+
   /// Create a copy of ClaimVerdictResult
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,6 +53,10 @@ abstract class $ClaimVerdictResultCopyWith<$Res> {
     double confidence,
     String? evidence,
     String? sourceUrl,
+    List<String> evidenceSnippets,
+    List<String> sources,
+    List<EvidenceMeta> evidenceMeta,
+    Origin? origin,
   });
 }
 
@@ -69,6 +81,10 @@ class _$ClaimVerdictResultCopyWithImpl<$Res, $Val extends ClaimVerdictResult>
     Object? confidence = null,
     Object? evidence = freezed,
     Object? sourceUrl = freezed,
+    Object? evidenceSnippets = null,
+    Object? sources = null,
+    Object? evidenceMeta = null,
+    Object? origin = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -96,6 +112,22 @@ class _$ClaimVerdictResultCopyWithImpl<$Res, $Val extends ClaimVerdictResult>
                 ? _value.sourceUrl
                 : sourceUrl // ignore: cast_nullable_to_non_nullable
                       as String?,
+            evidenceSnippets: null == evidenceSnippets
+                ? _value.evidenceSnippets
+                : evidenceSnippets // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            sources: null == sources
+                ? _value.sources
+                : sources // ignore: cast_nullable_to_non_nullable
+                      as List<String>,
+            evidenceMeta: null == evidenceMeta
+                ? _value.evidenceMeta
+                : evidenceMeta // ignore: cast_nullable_to_non_nullable
+                      as List<EvidenceMeta>,
+            origin: freezed == origin
+                ? _value.origin
+                : origin // ignore: cast_nullable_to_non_nullable
+                      as Origin?,
           )
           as $Val,
     );
@@ -118,6 +150,10 @@ abstract class _$$ClaimVerdictResultImplCopyWith<$Res>
     double confidence,
     String? evidence,
     String? sourceUrl,
+    List<String> evidenceSnippets,
+    List<String> sources,
+    List<EvidenceMeta> evidenceMeta,
+    Origin? origin,
   });
 }
 
@@ -141,6 +177,10 @@ class __$$ClaimVerdictResultImplCopyWithImpl<$Res>
     Object? confidence = null,
     Object? evidence = freezed,
     Object? sourceUrl = freezed,
+    Object? evidenceSnippets = null,
+    Object? sources = null,
+    Object? evidenceMeta = null,
+    Object? origin = freezed,
   }) {
     return _then(
       _$ClaimVerdictResultImpl(
@@ -168,6 +208,22 @@ class __$$ClaimVerdictResultImplCopyWithImpl<$Res>
             ? _value.sourceUrl
             : sourceUrl // ignore: cast_nullable_to_non_nullable
                   as String?,
+        evidenceSnippets: null == evidenceSnippets
+            ? _value._evidenceSnippets
+            : evidenceSnippets // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        sources: null == sources
+            ? _value._sources
+            : sources // ignore: cast_nullable_to_non_nullable
+                  as List<String>,
+        evidenceMeta: null == evidenceMeta
+            ? _value._evidenceMeta
+            : evidenceMeta // ignore: cast_nullable_to_non_nullable
+                  as List<EvidenceMeta>,
+        origin: freezed == origin
+            ? _value.origin
+            : origin // ignore: cast_nullable_to_non_nullable
+                  as Origin?,
       ),
     );
   }
@@ -183,7 +239,13 @@ class _$ClaimVerdictResultImpl implements _ClaimVerdictResult {
     this.confidence = 0.0,
     this.evidence,
     this.sourceUrl,
-  });
+    final List<String> evidenceSnippets = const <String>[],
+    final List<String> sources = const <String>[],
+    final List<EvidenceMeta> evidenceMeta = const <EvidenceMeta>[],
+    this.origin,
+  }) : _evidenceSnippets = evidenceSnippets,
+       _sources = sources,
+       _evidenceMeta = evidenceMeta;
 
   @override
   final String claim;
@@ -199,9 +261,44 @@ class _$ClaimVerdictResultImpl implements _ClaimVerdictResult {
   @override
   final String? sourceUrl;
 
+  /// Evidence shown to NLI; `sources` and `evidenceMeta` run parallel to it.
+  final List<String> _evidenceSnippets;
+
+  /// Evidence shown to NLI; `sources` and `evidenceMeta` run parallel to it.
+  @override
+  @JsonKey()
+  List<String> get evidenceSnippets {
+    if (_evidenceSnippets is EqualUnmodifiableListView)
+      return _evidenceSnippets;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_evidenceSnippets);
+  }
+
+  final List<String> _sources;
+  @override
+  @JsonKey()
+  List<String> get sources {
+    if (_sources is EqualUnmodifiableListView) return _sources;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_sources);
+  }
+
+  final List<EvidenceMeta> _evidenceMeta;
+  @override
+  @JsonKey()
+  List<EvidenceMeta> get evidenceMeta {
+    if (_evidenceMeta is EqualUnmodifiableListView) return _evidenceMeta;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_evidenceMeta);
+  }
+
+  /// Present only for claims the evidence did not support.
+  @override
+  final Origin? origin;
+
   @override
   String toString() {
-    return 'ClaimVerdictResult(claim: $claim, verdict: $verdict, status: $status, confidence: $confidence, evidence: $evidence, sourceUrl: $sourceUrl)';
+    return 'ClaimVerdictResult(claim: $claim, verdict: $verdict, status: $status, confidence: $confidence, evidence: $evidence, sourceUrl: $sourceUrl, evidenceSnippets: $evidenceSnippets, sources: $sources, evidenceMeta: $evidenceMeta, origin: $origin)';
   }
 
   @override
@@ -217,7 +314,17 @@ class _$ClaimVerdictResultImpl implements _ClaimVerdictResult {
             (identical(other.evidence, evidence) ||
                 other.evidence == evidence) &&
             (identical(other.sourceUrl, sourceUrl) ||
-                other.sourceUrl == sourceUrl));
+                other.sourceUrl == sourceUrl) &&
+            const DeepCollectionEquality().equals(
+              other._evidenceSnippets,
+              _evidenceSnippets,
+            ) &&
+            const DeepCollectionEquality().equals(other._sources, _sources) &&
+            const DeepCollectionEquality().equals(
+              other._evidenceMeta,
+              _evidenceMeta,
+            ) &&
+            (identical(other.origin, origin) || other.origin == origin));
   }
 
   @override
@@ -229,6 +336,10 @@ class _$ClaimVerdictResultImpl implements _ClaimVerdictResult {
     confidence,
     evidence,
     sourceUrl,
+    const DeepCollectionEquality().hash(_evidenceSnippets),
+    const DeepCollectionEquality().hash(_sources),
+    const DeepCollectionEquality().hash(_evidenceMeta),
+    origin,
   );
 
   /// Create a copy of ClaimVerdictResult
@@ -251,6 +362,10 @@ abstract class _ClaimVerdictResult implements ClaimVerdictResult {
     final double confidence,
     final String? evidence,
     final String? sourceUrl,
+    final List<String> evidenceSnippets,
+    final List<String> sources,
+    final List<EvidenceMeta> evidenceMeta,
+    final Origin? origin,
   }) = _$ClaimVerdictResultImpl;
 
   @override
@@ -265,6 +380,18 @@ abstract class _ClaimVerdictResult implements ClaimVerdictResult {
   String? get evidence;
   @override
   String? get sourceUrl;
+
+  /// Evidence shown to NLI; `sources` and `evidenceMeta` run parallel to it.
+  @override
+  List<String> get evidenceSnippets;
+  @override
+  List<String> get sources;
+  @override
+  List<EvidenceMeta> get evidenceMeta;
+
+  /// Present only for claims the evidence did not support.
+  @override
+  Origin? get origin;
 
   /// Create a copy of ClaimVerdictResult
   /// with the given fields replaced by the non-null parameter values.
@@ -456,6 +583,9 @@ mixin _$Verdict {
   ArticleVerdict get verdict => throw _privateConstructorUsedError;
   double get confidence => throw _privateConstructorUsedError;
   String? get rationale => throw _privateConstructorUsedError;
+
+  /// Plain-text explanation, including each claim's `ORIGIN TRAIL`.
+  String? get reasoningTrace => throw _privateConstructorUsedError;
   List<ClaimVerdictResult> get claims => throw _privateConstructorUsedError;
   List<Degradation> get degradations => throw _privateConstructorUsedError;
 
@@ -474,6 +604,7 @@ abstract class $VerdictCopyWith<$Res> {
     ArticleVerdict verdict,
     double confidence,
     String? rationale,
+    String? reasoningTrace,
     List<ClaimVerdictResult> claims,
     List<Degradation> degradations,
   });
@@ -497,6 +628,7 @@ class _$VerdictCopyWithImpl<$Res, $Val extends Verdict>
     Object? verdict = null,
     Object? confidence = null,
     Object? rationale = freezed,
+    Object? reasoningTrace = freezed,
     Object? claims = null,
     Object? degradations = null,
   }) {
@@ -513,6 +645,10 @@ class _$VerdictCopyWithImpl<$Res, $Val extends Verdict>
             rationale: freezed == rationale
                 ? _value.rationale
                 : rationale // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            reasoningTrace: freezed == reasoningTrace
+                ? _value.reasoningTrace
+                : reasoningTrace // ignore: cast_nullable_to_non_nullable
                       as String?,
             claims: null == claims
                 ? _value.claims
@@ -540,6 +676,7 @@ abstract class _$$VerdictImplCopyWith<$Res> implements $VerdictCopyWith<$Res> {
     ArticleVerdict verdict,
     double confidence,
     String? rationale,
+    String? reasoningTrace,
     List<ClaimVerdictResult> claims,
     List<Degradation> degradations,
   });
@@ -562,6 +699,7 @@ class __$$VerdictImplCopyWithImpl<$Res>
     Object? verdict = null,
     Object? confidence = null,
     Object? rationale = freezed,
+    Object? reasoningTrace = freezed,
     Object? claims = null,
     Object? degradations = null,
   }) {
@@ -578,6 +716,10 @@ class __$$VerdictImplCopyWithImpl<$Res>
         rationale: freezed == rationale
             ? _value.rationale
             : rationale // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        reasoningTrace: freezed == reasoningTrace
+            ? _value.reasoningTrace
+            : reasoningTrace // ignore: cast_nullable_to_non_nullable
                   as String?,
         claims: null == claims
             ? _value._claims
@@ -599,6 +741,7 @@ class _$VerdictImpl extends _Verdict {
     required this.verdict,
     this.confidence = 0.0,
     this.rationale,
+    this.reasoningTrace,
     final List<ClaimVerdictResult> claims = const <ClaimVerdictResult>[],
     final List<Degradation> degradations = const <Degradation>[],
   }) : _claims = claims,
@@ -612,6 +755,10 @@ class _$VerdictImpl extends _Verdict {
   final double confidence;
   @override
   final String? rationale;
+
+  /// Plain-text explanation, including each claim's `ORIGIN TRAIL`.
+  @override
+  final String? reasoningTrace;
   final List<ClaimVerdictResult> _claims;
   @override
   @JsonKey()
@@ -632,7 +779,7 @@ class _$VerdictImpl extends _Verdict {
 
   @override
   String toString() {
-    return 'Verdict(verdict: $verdict, confidence: $confidence, rationale: $rationale, claims: $claims, degradations: $degradations)';
+    return 'Verdict(verdict: $verdict, confidence: $confidence, rationale: $rationale, reasoningTrace: $reasoningTrace, claims: $claims, degradations: $degradations)';
   }
 
   @override
@@ -645,6 +792,8 @@ class _$VerdictImpl extends _Verdict {
                 other.confidence == confidence) &&
             (identical(other.rationale, rationale) ||
                 other.rationale == rationale) &&
+            (identical(other.reasoningTrace, reasoningTrace) ||
+                other.reasoningTrace == reasoningTrace) &&
             const DeepCollectionEquality().equals(other._claims, _claims) &&
             const DeepCollectionEquality().equals(
               other._degradations,
@@ -658,6 +807,7 @@ class _$VerdictImpl extends _Verdict {
     verdict,
     confidence,
     rationale,
+    reasoningTrace,
     const DeepCollectionEquality().hash(_claims),
     const DeepCollectionEquality().hash(_degradations),
   );
@@ -676,6 +826,7 @@ abstract class _Verdict extends Verdict {
     required final ArticleVerdict verdict,
     final double confidence,
     final String? rationale,
+    final String? reasoningTrace,
     final List<ClaimVerdictResult> claims,
     final List<Degradation> degradations,
   }) = _$VerdictImpl;
@@ -687,6 +838,10 @@ abstract class _Verdict extends Verdict {
   double get confidence;
   @override
   String? get rationale;
+
+  /// Plain-text explanation, including each claim's `ORIGIN TRAIL`.
+  @override
+  String? get reasoningTrace;
   @override
   List<ClaimVerdictResult> get claims;
   @override

@@ -35,10 +35,21 @@ class ArticleSubmitController extends AutoDisposeAsyncNotifier<String?> {
   @override
   Future<String?> build() async => null;
 
-  Future<void> submit(String text) async {
+  Future<void> submit(String text, {String? region}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() {
-      return ref.read(articlesRepositoryProvider).submitArticle(text);
+      return ref
+          .read(articlesRepositoryProvider)
+          .submitArticle(text, region: region);
+    });
+  }
+
+  Future<void> submitImage(String path, {String? region}) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() {
+      return ref
+          .read(articlesRepositoryProvider)
+          .submitImage(path, region: region);
     });
   }
 

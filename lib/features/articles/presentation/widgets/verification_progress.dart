@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/article_enums.dart';
 
 /// Vertical step indicator shown while an article is `processing`.
@@ -28,8 +27,7 @@ class VerificationProgress extends StatelessWidget {
           ),
         const SizedBox(height: 12),
         Text(
-          'Each stage times out after ${AppConstants.agenticStageTimeout.inSeconds}s; '
-          'up to ${AppConstants.maxClaims} claims are checked.',
+          'A short claim takes about 10–30 seconds; a full article longer.',
           style: theme.textTheme.bodySmall,
         ),
       ],

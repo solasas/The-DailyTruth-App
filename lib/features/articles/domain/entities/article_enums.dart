@@ -22,45 +22,29 @@ extension ArticleStatusX on ArticleStatus {
   };
 }
 
-/// Coarse pipeline stage, surfaced as a progress hint while `processing`.
-enum ArticleStage {
-  queued,
-  extractingClaims,
-  retrievingEvidence,
-  checkingEntailment,
-  aggregating,
-  done,
-  unknown,
-}
+/// Pipeline stage, surfaced as a progress hint while `processing`.
+/// The server reports `queued`, then `verifying`.
+enum ArticleStage { queued, verifying, done, unknown }
 
 extension ArticleStageX on ArticleStage {
   String get label => switch (this) {
     ArticleStage.queued => 'Queued',
-    ArticleStage.extractingClaims => 'Extracting claims',
-    ArticleStage.retrievingEvidence => 'Retrieving evidence',
-    ArticleStage.checkingEntailment => 'Checking entailment',
-    ArticleStage.aggregating => 'Aggregating verdict',
+    ArticleStage.verifying => 'Checking claims against sources',
     ArticleStage.done => 'Done',
     ArticleStage.unknown => 'Working',
   };
 
-  /// Ordered position for a step indicator (0-based). `unknown` sorts last.
+  /// Ordered position for a step indicator (0-based).
   int get order => switch (this) {
     ArticleStage.queued => 0,
-    ArticleStage.extractingClaims => 1,
-    ArticleStage.retrievingEvidence => 2,
-    ArticleStage.checkingEntailment => 3,
-    ArticleStage.aggregating => 4,
-    ArticleStage.done => 5,
-    ArticleStage.unknown => 5,
+    ArticleStage.verifying => 1,
+    ArticleStage.done => 2,
+    ArticleStage.unknown => 1,
   };
 
   static const orderedSteps = [
     ArticleStage.queued,
-    ArticleStage.extractingClaims,
-    ArticleStage.retrievingEvidence,
-    ArticleStage.checkingEntailment,
-    ArticleStage.aggregating,
+    ArticleStage.verifying,
     ArticleStage.done,
   ];
 
@@ -68,24 +52,10 @@ extension ArticleStageX on ArticleStage {
     final v = raw?.toLowerCase().trim() ?? '';
     if (v.isEmpty) return ArticleStage.unknown;
     if (v.contains('queue')) return ArticleStage.queued;
-    if (v.contains('extract') || v.contains('claim')) {
-      return ArticleStage.extractingClaims;
-    }
-    if (v.contains('retriev') ||
-        v.contains('search') ||
-        v.contains('evidence')) {
-      return ArticleStage.retrievingEvidence;
-    }
-    if (v.contains('entail') || v.contains('nli') || v.contains('verif')) {
-      return ArticleStage.checkingEntailment;
-    }
-    if (v.contains('aggreg') || v.contains('score') || v.contains('summar')) {
-      return ArticleStage.aggregating;
-    }
     if (v.contains('done') || v.contains('complet') || v.contains('finish')) {
       return ArticleStage.done;
     }
-    return ArticleStage.unknown;
+    return ArticleStage.verifying;
   }
 }
 
@@ -94,7 +64,7 @@ enum ArticleVerdict { likelyFake, likelyReal, uncertain }
 
 extension ArticleVerdictX on ArticleVerdict {
   String get label => switch (this) {
-    ArticleVerdict.likelyFake => 'Likely fake',
+    ArticleVerdict.likelyFake => 'Likely misinformation',
     ArticleVerdict.likelyReal => 'Likely real',
     ArticleVerdict.uncertain => 'Uncertain',
   };
@@ -117,8 +87,8 @@ extension ClaimVerdictX on ClaimVerdict {
   String get label => switch (this) {
     ClaimVerdict.entailment => 'Supported',
     ClaimVerdict.contradiction => 'Contradicted',
-    ClaimVerdict.neutral => 'Neutral',
-    ClaimVerdict.unverifiable => 'Unverifiable',
+    ClaimVerdict.neutral => 'No clear signal',
+    ClaimVerdict.unverifiable => 'Could not verify',
   };
 
   static ClaimVerdict parse(String? raw) {
@@ -165,6 +135,7 @@ extension DegradationSeverityX on DegradationSeverity {
       .trim()) {
     'major' || 'severe' || 'critical' || 'high' => DegradationSeverity.major,
     'minor' ||
+    'warn' ||
     'moderate' ||
     'low' ||
     'medium' ||

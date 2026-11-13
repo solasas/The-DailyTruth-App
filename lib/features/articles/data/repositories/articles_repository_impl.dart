@@ -11,8 +11,17 @@ class ArticlesRepositoryImpl implements ArticlesRepository {
   final ArticlesRemoteDataSource _remote;
 
   @override
-  Future<String> submitArticle(String text) =>
-      _remote.submit(text: text.trim());
+  Future<String> submitArticle(String text, {String? region}) =>
+      _remote.submit(text: text.trim(), region: _clean(region));
+
+  @override
+  Future<String> submitImage(String path, {String? region}) =>
+      _remote.submitImage(path: path, region: _clean(region));
+
+  static String? _clean(String? v) {
+    final t = v?.trim();
+    return (t == null || t.isEmpty) ? null : t;
+  }
 
   @override
   Future<Article> getArticle(String id) => _remote.getArticle(id);

@@ -100,7 +100,14 @@ class SoftCard extends StatelessWidget {
               ),
             ],
           ),
-          child: child,
+          // Any ListTile-family widget (ListTile, SwitchListTile,
+          // ExpansionTile...) paints its background/ink on the nearest
+          // Material — which without this would be the transparent one
+          // above, sitting *behind* this opaque Container. This extra
+          // transparency-type Material sits in front of the fill instead, so
+          // nested tiles render correctly instead of tripping Flutter's
+          // "background color or ink splashes may be invisible" assertion.
+          child: Material(type: MaterialType.transparency, child: child),
         ),
       ),
     );
