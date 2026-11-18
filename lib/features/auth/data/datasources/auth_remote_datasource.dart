@@ -22,16 +22,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
   }) {
     return _client.guard(() async {
-      // FastAPI's OAuth2PasswordRequestForm expects form-encoded fields, not
-      // JSON — hence the explicit content type and `FormData`.
+      // The backend's LoginRequest is a JSON body ({username, password});
+      // `username` also accepts an email address.
       final response = await _client.dio.post(
         ApiEndpoints.authToken,
         data: {
           'username': username,
           'password': password,
-          'grant_type': 'password',
         },
-        options: Options(contentType: Headers.formUrlEncodedContentType),
+        options: Options(contentType: Headers.jsonContentType),
       );
       final data = response.data as Map<String, dynamic>;
       return TokenResponseDto.fromJson(data);

@@ -37,7 +37,11 @@ class TokenResponseDto with _$TokenResponseDto {
       tokenType: (tokenType != null && tokenType.trim().isNotEmpty)
           ? tokenType
           : 'bearer',
-      role: json['role'] as String? ?? json['user_role'] as String?,
+      // Older backends put `role` at the top level; the current one nests it
+      // under `user` ({access_token, token_type, expires_in_minutes, user}).
+      role: json['role'] as String? ??
+          json['user_role'] as String? ??
+          (json['user'] is Map ? (json['user'] as Map)['role'] as String? : null),
       expiresInSeconds: expiry,
     );
   }
