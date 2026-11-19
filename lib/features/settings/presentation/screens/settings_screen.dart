@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-import '../../../../core/config/env_config.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/utils/snackbar_utils.dart';
 import '../../../../core/widgets/gradient_card.dart';
@@ -20,35 +19,6 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  late final TextEditingController _urlController;
-
-  @override
-  void initState() {
-    super.initState();
-    _urlController = TextEditingController(text: ref.read(apiBaseUrlProvider));
-  }
-
-  @override
-  void dispose() {
-    _urlController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _saveBaseUrl() async {
-    final url = _urlController.text.trim();
-    if (url.isEmpty) return;
-    await ref.read(apiBaseUrlProvider.notifier).setApiBaseUrl(url);
-    if (mounted) SnackbarUtils.showSuccess(context, 'API base URL updated');
-  }
-
-  Future<void> _resetBaseUrl() async {
-    await ref
-        .read(apiBaseUrlProvider.notifier)
-        .setApiBaseUrl(EnvConfig.defaultApiBaseUrl);
-    _urlController.text = EnvConfig.defaultApiBaseUrl;
-    if (mounted) SnackbarUtils.showSuccess(context, 'Reset to default');
-  }
-
   Future<void> _clearCache() async {
     await ref.read(settingsRepositoryProvider).clearCache();
     if (mounted) SnackbarUtils.showSuccess(context, 'Local cache cleared');
@@ -151,47 +121,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     .setThemeMode(value ? ThemeMode.dark : ThemeMode.light);
               },
               secondary: const Icon(Icons.dark_mode_rounded),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text('Backend', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          SoftCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('API Base URL', style: theme.textTheme.bodyMedium),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _urlController,
-                  keyboardType: TextInputType.url,
-                  autocorrect: false,
-                  decoration: const InputDecoration(
-                    hintText: 'https://your-api-host',
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'In use: ${ref.watch(apiBaseUrlProvider)}\n'
-                  'Default: ${EnvConfig.defaultApiBaseUrl}',
-                  style: theme.textTheme.bodySmall,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: _resetBaseUrl,
-                      child: const Text('Reset to default'),
-                    ),
-                    const SizedBox(width: 8),
-                    FilledButton(
-                      onPressed: _saveBaseUrl,
-                      child: const Text('Save'),
-                    ),
-                  ],
-                ),
-              ],
             ),
           ),
           const SizedBox(height: 24),

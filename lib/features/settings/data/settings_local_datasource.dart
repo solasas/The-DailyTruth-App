@@ -37,7 +37,9 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
 
   @override
   String getApiBaseUrl() {
-    return _prefs.getString(_apiBaseUrlKey) ?? EnvConfig.defaultApiBaseUrl;
+    // The URL is no longer user-editable; ignore any value saved by older
+    // builds so a stale address can't override the configured backend.
+    return EnvConfig.defaultApiBaseUrl;
   }
 
   @override
